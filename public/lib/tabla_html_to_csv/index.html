@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+	<title>Test export csv</title>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"> </script>
+  <script type="text/javascript" src="jquery.toCSV.min.js"> </script>
+
+  <script>
+		function exportar(){
+			$("table").toCSV();
+		}
+	</script>
+
+</head>
+<body>
+<h1>Test Tabla a CSV</h1>
+<p>Hacé click en el botón para convertir la data.</p>
+<button onclick="exportar()" download="your-foo.csv">Exportar CSV</button>
+
+<table border="1" cellpadding="2" cellspacing="0">
+<tr style="font-weight: bold; background-color: #aaa;">
+<td>A&ntilde;o</td><td>Selecci&oacute;n</td><td>Sitio</td><td>Diferencia puestos</td><td>Diferencia puntos</td><td>Number of Records</td><td>Posici&oacute;n anterior</td><td>Puesto</td><td>Puntos anterior</td><td>Puntos</td>
+</tr>
+<tr style="background-color: #f0f0f0">
+<td>Ene 2013</td><td>Argentina</td><td>http://espndeportes.espn.go.com/futbol/equipo/_/equipo/202/argentina</td><td align="right">0</td><td align="right">0</td><td align="right">1</td><td align="right">3</td><td align="right">3</td><td align="right">1290</td><td align="right">1290</td>
+</tr>
+<tr style="background-color: #ffffff">
+<td>Feb 2013</td><td>Argentina</td><td>http://espndeportes.espn.go.com/futbol/equipo/_/equipo/202/argentina</td><td align="right">0</td><td align="right">-9</td><td align="right">1</td><td align="right">3</td><td align="right">3</td><td align="right">1290</td><td align="right">1281</td>
+</tr>
+<tr style="background-color: #f0f0f0">
+<td>Ene 2013</td><td>Colombia</td><td>http://espndeportes.espn.go.com/futbol/equipo/_/equipo/208/colombia</td><td align="right">0</td><td align="right">0</td><td align="right">1</td><td align="right">5</td><td align="right">5</td><td align="right">1164</td><td align="right">1164</td>
+</tr>
+<tr style="background-color: #ffffff">
+<td>Feb 2013</td><td>Colombia</td><td>http://espndeportes

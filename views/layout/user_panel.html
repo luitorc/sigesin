@@ -1,0 +1,326 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <%-init.head%>
+  <style>
+    #panel_base {
+      background-image: url(./img/loading2.gif);
+      background-repeat: no-repeat;
+      background-position: center 100px;
+    }
+    
+    #menu-utils img {
+      padding: 0px 10px;
+      cursor: pointer;
+    }
+    
+    #gr_option li.enabled {
+      cursor: pointer;
+    }
+
+    #base_chat{
+      position: fixed;
+      z-index: 21;
+      bottom: 0;
+      width: 260px;
+      height: 380px;
+      background-color: white;
+      box-shadow: 3px 3px 20px #333;
+      right: 0;
+    }
+    .min_window:hover{
+      cursor: pointer;
+      background-color: #7C90E5;
+    }
+    .menu_download{
+      line-height: 4px;
+    }
+  </style>
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body style="padding-right: 0px;">
+  <div style="" id="base_chat">
+    <div style="background-color: #C14848;color:white;padding: 2px;">&nbsp;&nbsp; <span class='min_window' onclick="mini_chat_hide();" style="font-size:20px;" id='ico_action'>__ </span> &nbsp;&nbsp;&nbsp;&nbsp;<span onclick="mini_chat_hide();">Chat Institucional</span> </div>
+    <iframe src="/mini_chat?clis" frameborder="0" height="350" width="260" id="iframe_mini_chat"> </iframe>
+    <script>
+      var min_max = -1;
+      function mini_chat_hide(){
+        $("#iframe_mini_chat").attr("src","/mini_chat?clis");
+        min_max = min_max * -1;
+        if( min_max == 1 ){
+          $("#iframe_mini_chat").hide();
+          $("#base_chat").css({"height":"28px"});
+          $("#ico_action").html("☐");          
+        }else{
+          $("#iframe_mini_chat").show();
+          $("#base_chat").css({"height":"380px"});
+          $("#ico_action").html("__");          
+
+        }
+      }
+      // $(document).ready(function() {
+      //   // mini_chat_hide();
+        
+      // });
+    </script>
+  </div>
+  <nav class="navbar navbar-full navbar-light bg-faded">
+    <a class="navbar-brand" href="/">SIGESIN</a>
+    <ul class="nav navbar-nav pull-right">
+      <li class="nav-item">
+        <a class="nav-link" href="/" style="color:#493C9A;text-decoration: underline;">Panel de Soporte</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="#"><b style="color:blue;"><%=usuario.usuario_name%></b></a>
+      </li>
+      <!-- <li class="nav-item">
+        <a class="nav-link" href="#">Atención</a>
+      </li> -->
+      <!-- <li class="nav-item">
+        <a class="nav-link" href="#">Servicio</a>
+      </li> -->
+      <!-- <li class="nav-item">
+        <a class="nav-link" href="#">Acerca de nosotros<br></a>
+      </li> -->
+      <li class="nav-item">
+        <a class="nav-link" href="session_exit" style="color:red;">Cerrar Sessión<br></a>
+      </li>
+    </ul>
+  </nav>
+  <div class="section">
+          <div style="background-color: #E35C5C;height: 3px;box-shadow: 3px 1px 5px #ccc;"></div>
+    <div class="container">
+      <br>
+      <div class="row">
+        <div id='btn_menu_view' style="background-color:;position: absolute;z-index: 2; "><img src="ico/options.png" alt="no permitido" style="width: 50px;"></div>
+        <div class="col-lg-3" style="z-index: 3;background-color:white;box-shadow: 3px 0px 5px #bbb;padding: 10px;position: absolute;display: none;" id="p_control">
+          <div class="row" id="menu-utils" align="center">
+            <% if(usuario.priv == "admin"){ %>
+              <button onclick="ws.emit('reload_req',true);">R</button> 
+            <%}%>
+            <!-- <img src="./img/chat.png" style="width:60px;" title="Abrir chat en tiempo real" data-target="#modal-chat" data-toggle="modal"> -->
+            <img src="img\security.png" style="width:50px;" onclick="callSoporte('security');" title="Llamar a Agente de seguridad de Pronabec">
+             <img src="img\chofer.png" style="width:60px;" onclick="callSoporte('transport');" title="llamar a Conductor de Pronabec">
+             <img src="img\informatico.png" style="width:60px;" onclick="callSoporte('informatic');" title="llamar a Soporte Informatico">
+             <!-- &nbsp;&nbsp;&nbsp;<button>In</button> -->
+            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+            <img src="img\btn_emergencia.png" style="width: 70px;" onclick="callSoporte('security_sos');" title="Alerta de emergencia (Activar solo en caso de emergencia)">
+            
+          </div>
+          <hr class="" draggable="false">
+          <ul class="list-group" id="gr_option">
+            <li class="active enabled list-group-item" onclick="changue_select('attention');" id="attention">SICAT <span style="font-size:12px;color:orange;"><b>V.1.1</b></span><br><span style="font-size: 12px;">(Sistema de control de atención)</span>
+              <span style="color:red;" class="text-info"></span>
+            </li>
+            <li class="enabled list-group-item" onclick="changue_select('sindibe?mapl');" id="diffusion">SINDIBE <span style="font-size:12px;color:orange;"><b>V.1.4</b></span><br><span style="font-size: 12px;">(Sistema integrado de difusión de becas)</span>
+              <span style="color:red;" class="text-info"></span>
+            </li>
+            <li class="enabled list-group-item" onclick="changue_select('sidesun');" id="sidesun">SIDESUN <span style="font-size:12px;color:orange;"><b>V.1.0</b></span><br><span style="font-size: 12px;">(Sistema de supervisión de notas)</span>
+              <span style="color:red;" class="text-info"></span>
+            </li>
+            <li class="enabled list-group-item" onclick="changue_select('directorio_becario');" id="directorio_becario">DIRECTORIO BECARIO <span style="font-size:12px;color:orange;"><b>*</b></span><br><span style="font-size: 12px;"></span>
+              <span style="color:red;" class="text-info"></span>
+            </li>
+            <li class="enabled list-group-item" onclick="changue_select('info_user');" id="info_user">VERIFICACION DE IDENTIDAD <span style="font-size:12px;color:orange;"><b>*</b></span><br><span style="font-size: 12px;"></span>
+              <span style="color:red;" class="text-info"></span>
+            </li>
+          </ul>
+          <br><br>
+          <hr>
+          <div>
+            <p class='menu_download' style="text-decoration: underline;">Aplicativos Desktop:</p>
+            <p class='menu_download'>- <a href="assets/chat_institucional.rar">Chat institucional (Desktop)</a></p>
+            <p class='menu_download' style="text-decoration: underline;">Aplicativos Android:</p>
+            <p class='menu_download'>- <a href="apk/directoriobecario.apk">Directorio Becario</a></p>
+            <p class='menu_download'>- <a href="apk/sms server sigesin.apk">Servidor de MSN</a></p>
+            <p class='menu_download'>- <a href="apk/info becas.apk">Becas del Peru</a></p>
+            <p class='menu_download'>- <a href="apk/chat institucional.apk">Chat Institucional</a></p>
+            <p class='menu_download'>- <a href="apk/seguridad sigesin.apk">Seguridad Sigesin</a></p>
+            <p class='menu_download'>- <a href="apk/transporte sigesin.apk">Transporte Sigesin</a></p>
+            <p class='menu_download'>- <a href="apk/soporte informatico sigesin.apk">Soporte Informatico Sigesin</a></p>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        
+        <div class="col-lg-12 text-xs-center" id="panel_base" style="margin: 0px 40px;">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <hr class="" draggable="false">
+          <h6 class="text-primary text-xs-center" contenteditable="false">
+              <br>
+              <br>Consultas: Sr.Luis Torres - 935422777</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="modal-chat" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+
+          <h4 class="modal-title">Chat Virtual <span class="text-warning">(En construcción)</span></h4>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted">Bienvenido al chat de SIGESIN, estamos implementando varias funciones para mejorar los procesos para el cumplimiento de los objetivos de Pronabec Moquegua.</p>
+          <div class="row">
+            <div class="col-lg-7">
+              <textarea rows="10" cols="60" placeholder="Bienvenido a el chat de pronabec Moquegua."></textarea>
+              <textarea rows="2" cols="60" placeholder="Escribe aqui..."></textarea>
+            </div>
+            <div class="col-lg-5 ">
+              <ul class="list-group" draggable="false">
+                <li class="list-group-item">Todos
+                  <span class="label label-default label-pill pull-right">2</span></li>
+                <li class="list-group-item">Prac.Luis Torres Carpio<i class="fa fa-circle fa-fw pull-right text-success"></i></li>
+                <li class="list-group-item">Lic.Carmen<i class="fa fa-circle fa-fw pull-right text-danger"></i></li>
+                <li class="list-group-item">Lic.Daniel
+                  <i class="fa fa-circle fa-fw pull-right text-danger"></i></li>
+                <li class="list-group-item">Lic.Lisandro<i class="fa fa-circle fa-fw pull-right text-success"></i></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="margin: 10px;">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<%-init.foot%>
+  <script>
+  $(document).ready(function() {
+    
+    changue_select("attention");
+    // changue_select("attention?vgra");
+    // changue_select("sindibe?mmov");
+    verificar_msn();
+    // mini_chat_hide();
+
+  });
+
+  function verificar_msn(){
+    $.post('/chat_list', {id_usuario: <%=usuario.id_usuario%>}, function(dt, textStatus, xhr) {
+        /*optional stuff to do after success */
+        var dh = "";
+        var ok = false;
+        // console.log(dt);
+        for( i in dt ){
+            if(dt[i].cant != "")
+              ok = true;
+            
+        }
+        if(!ok) //En caso que no se encuentre msm, lo ocultamos
+          mini_chat_hide();
+
+    });
+  }
+  $( "#btn_menu_view,#p_control" ).hover(
+    function() {
+      // $( this ).append( $( "<span> ***</span>" ) );
+      $("#p_control").show();
+    }, function() {
+      // $( this ).find( "span:last" ).remove();
+      $("#p_control").hide();
+    }
+  );
+  var audioElement;
+  audioElement = document.createElement('audio');
+  audioElement.setAttribute('src', 'sound/ping1.mp3');
+  var ws = io();
+    $(document).on("ready", function(){
+      ws.on( "open_chat", function(success){
+        if(success){
+          $("#iframe_mini_chat").show();
+          $("#base_chat").css({"height":"380px"});
+          $("#ico_action").html("__");   
+        }
+      });
+      ws.on( "attention", function(new_attention){
+        if(new_attention){
+          $("body").scrollTop(100);
+        }
+      });
+      ws.on( "reload_res", function(dt){
+        if( dt )
+          window.location.href="/user_panel";
+      });
+      ws.on( "attention_sound", function(sound){
+        if(sound){
+          audioElement.currentTime = 0;
+          audioElement.play();
+        }
+      });
+      ws.on('chat_msn_res', function(dt){
+        if(dt.user_recept == <%=usuario.id_usuario%> ){
+          if( min_max == 1 ){
+            mini_chat_hide();
+            
+          }
+        }
+      });
+    });
+    function changue_select(modulo){
+      moduloId = modulo.split("?")[0];
+      // $("#panel_base").html("<iframe src='"+modulo+"' frameborder='0' width='100%' height='2300px'></iframe>");
+      // $("#panel_base").html("<object type='text/html' data='"+modulo+"' width='100%' height='1200px'> < /object>");
+      $("#panel_base").html("<iframe src='"+modulo+"' width='100%' height='1200px' frameBorder='0'> </iframe>");
+      $("#gr_option li").removeClass("active");
+      $("#"+moduloId).addClass("active");
+      $("#p_control").hide();
+    }
+    function callSoporte(agente){
+      var notify = "Porfavor, apersonarse a mi oficina.";
+      var id_agente = 0;
+      switch(agente){
+        case 'security':
+          id_agente = 9
+          break;
+        case 'transport':
+          id_agente = 5
+          break;
+        case 'informatic':
+          id_agente = 6
+          break;
+        case 'security_sos':
+          notify = "SOS";
+          id_agente = 9
+          break;
+      }
+      $.post('/send_msn', {
+        text1: notify
+        ,src: "false"
+        ,user_emit: <%=usuario.id_usuario%>
+        ,user_recept: id_agente
+        ,usuario_name: '<%=usuario.usuario_name%>'
+      }, function(dt, textStatus, xhr) {
+        
+        // ws.emit("chat_msn_req", {
+        //     user_recept: 9
+        //     ,user_emit: <%=usuario.id_usuario%>
+        //     ,texto: notify
+        //     ,usuario_name: "<%=usuario.usuario_name%>"
+        // });
+      });
+
+      
+    }
+
+  </script>
+
+
+</body>
+
+</html>

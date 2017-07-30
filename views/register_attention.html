@@ -1,0 +1,572 @@
+<!--
+                                                          :::      ::::::::
+     register_attention.html                            :+:      :+:    :+:
+                                                      +:+ +:+         +:+
+     By: anonymous <anonymous@student.42.fr>        +#+  +:+       +#+
+                                                  +#+#+#+#+#+   +#+
+     Created: 2017/01/17 08:36:06 by anonymous         #+#    #+#
+     Updated: 2017/05/05 11:06:21 by anonymous        ###   ########.fr
+-->
+<% layout('layout/register_attention.html') %>
+
+<% user_register = function(){
+var dhg=`
+ <form action="/register_req" id="target">
+  <table border="1" width="100%" cellspacing=0 id=tb-regis style="border-color:#DFDFDF;">
+    <tr>
+      <td colspan="2">
+          <img src="ico/back.png" width='80' style="margin-left:;" onclick="window.history.back()" title="Volver">
+         &nbsp;&nbsp;
+        `;
+        if( typeof params.dni != "undefined" )
+          dhg+=`
+            <a href="/${rdr}?vpre">Regresar</a>
+          `;
+        dhg+=`
+      </td>
+    </tr>
+    <tr>
+      <th colspan=2 align="center" style="text-align: center;">
+        <div id='title_form'>REGISTRO DE USUARIO</div>
+      </th>
+    </tr>
+    <tr>
+      <td>Dni:</td>
+      <td>
+        <div class="form-inline">
+            <input type="text" name="dni" value="" class="form-control" onkeyup="verificar();">
+            <span class="form-control" onclick="verificar();" style="cursor:pointer;" id="verify">Verificar</span>    
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td width=150>Nombres:</td>
+      <td><input type="text" name="nombres" value="" class="form-control"></td>
+    </tr>
+    <tr>
+      <td>Telefono:</td>
+      <td><input type="text" name="telefono" value="" class="form-control"></td>
+    </tr>
+    <tr>
+      <td>Edad:</td>
+      <td><input type="text" name="edad" value="" class="form-control"></td>
+    </tr>
+    <tr>
+      <td>Lugar:</td>
+      <td><input type="text" name="lugar" value="" class="form-control"></td>
+    </tr>
+    
+    <tr>
+      <td>Identidad:</td>
+      <td>
+        <select name="identidad" class="form-control" id="identidad">
+          <option value=" ">seleccionar...</option>
+          <option value="Aspirante a Beca">Aspirante a Beca</obloption>
+          <option value="Becario">Becario</option>
+          <option value="Padre de Aspirante">Padre de Aspirante</option>
+          <option value="Padre de Becario">Padre de Becario</option>
+          <option value="Representante de Aspirante">Representante de Aspirante</option>
+          <option value="Representante de Becario">Representante de Becario</option>
+          <option value="Representante de Institución">Representante de Institución</option>
+          <option value="Aspirante a credito Educativo">Aspirante a credito Educativo</option>
+          <option value="Representante de Aspirante a Credito Educativo">Representante de Aspirante a Credito Educativo</option>
+          <option value="Persona Natural">Persona Natural</option>
+          <option value="Persona Juridica">Persona Juridica</option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>Identidad-descripción (opcional):</td>
+      <td>
+        <textarea name="identity_description" width="100%" rows="2" class="form-control"></textarea>
+      </td>
+    </tr>
+    <tr style="display: none;">
+      <td>Seleccione tipo de beca</td>
+      <td>
+        <select id="rubro_beca" class="form-control">
+          <option value="b_pregrado">BECAS DE PREGRADO</option>
+          <option value="b_especiales">BECAS ESPECIALES</option>
+          <option value="b_posgrado">BECAS POSGRADO</option>
+          <option value="nose">OTROS</option>
+          <option value="nose1">- -</option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>Beca de Interes:</td>
+      <td>
+        <select name="aspira_beca" class="form-control" id="aspira_beca">
+          <option value=""></option>
+        </select>
+        <span style="color:#A0A0A0;"></span>
+      </td>
+    </tr>
+    <tr style='background-color:#FFCECE;'>
+      <td>Motivo:</td>
+      <td>
+        <select name="motivo" id="motivo" class="form-control">
+          <option value="">seleccionar...</option>
+          <option value="1">Dudas y consultas</option>
+          <option value="2">Inscripción</option>
+          <option value="3">Tramites</option>
+          <option value="4">Convenios</option>
+          <option value="5">Credito Educativo</option>
+          <option value="0">Otro motivo</option>
+        </select>
+      </td>
+    </tr>
+    <tr id="motivo_especificado_tr" style="display: none;">
+      <td>Especifique el Motivo:</td>
+      <td>
+        <textarea name="motivo_name" id="motivo_name" width="100%" rows="2" class="form-control"></textarea>
+      </td>
+    </tr>
+    <tr style="">
+      <td>Correo:</td>
+      <td>
+        <input type="text" class="form-control" name="correo" placeholder="ejemplo_123@hotmail.com">
+      </td>
+    </tr>
+    <tr>
+      <td>Sexo:</td>
+      <td>&nbsp;
+        <label for="">Hombre 
+          <input type="radio" name='sexo' id='sexo1' value='true' >
+        </label>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <label for="">Mujer 
+          <input type="radio" name='sexo' id='sexo1' value='false'>
+        </label>
+      </td>
+    </tr>
+    <tr id="descripcion_tr" style="display: none;">
+      <td>Observación de atención:</td>
+      <td>
+        <textarea name="asunto" id="asunto" width="100%" rows="5" class="form-control"></textarea> <!--descripcion de la atención-->
+      </td>
+    </tr>
+    <tr id="observacion_tr" style="display: none;">
+      <td>Observación de atención:</td>
+      <td>
+        <textarea id="observacion" width="100%" rows="5" class="form-control"></textarea>
+      </td>
+    </tr>
+    <tr id="type_attention">
+      <td>Tipo de Atención:</td>
+      <td>
+        <span><input type="radio" name="type" checked value="1">Estandar</span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span><input type="radio" name="type" value="2">Preferencial <span style="color:#D85201;">(Ley N° 28683)</span></span>
+      </td>
+    </tr>
+    <tr style="display: none;">
+      <td>Atención por:</td>
+      <td>
+        <input type="text" name="attention_phone" value="false" class="form-control">
+      </td>
+    <tr>
+    `;
+    <!-- console.log(params.dni); -->
+    if( typeof params.dni != "undefined" )
+      dhg+=`
+    <tr>
+      <td>Fecha:</td>
+      <td><input type="text" value=""  id="fecha" style="color:blue;" class="form-control"></td>
+    </tr>
+    <tr>
+      <td>Hora:</td>
+      <td><input type="text" value=""  id="hora" style="color:blue;" class="form-control"></td>
+    </tr>
+    <tr>
+      <td>Resumen:</td>
+      <td>
+        <textarea id="resumen1" cols="30" rows="4" class="form-control"></textarea>
+      </td>
+    </tr>
+    <tr>
+      <td>Observación:</td>
+      <td>
+        <textarea id="observacion1" cols="30" rows="4" class="form-control"></textarea>
+      </td>
+    </tr>
+    <tr>
+      <td>Atendido por:</td>
+      <td>
+        <input type="text" id="usuario_name" class="form-control">
+      </td>
+    </tr>
+    `;
+    if( typeof user != "undefined" && typeof params.dni == "undefined" )
+      dhg+=`
+      <tr>
+        <th colspan="2" style="color:#C74E4E;">Campos <span style="color:green;">verdes</span> validos solo para atención via telefono</th>
+      </tr>
+      <tr style="background-color: #C4F9BF;">
+        <td>Resumen:</td>
+        <td>
+          <textarea name="resumen1" cols="30" rows="4" class="form-control"></textarea>
+        </td>
+      </tr>
+      <tr style="background-color: #C4F9BF;">
+        <td>Observación:</td>
+        <td>
+          <textarea name="observacion1" cols="30" rows="3" class="form-control"></textarea>
+        </td>
+      </tr>
+    `;
+    dhg+=`<tr>
+      <td colspan="2" align="center" id="options_btn">
+        <br>
+        <button type="submit" id="submit1" style="padding: 5px;cursor: pointer;background-color: #5475C8;color:white;">Añadir a la lista</button>&nbsp;&nbsp;
+        <span style="padding: 10px;cursor: pointer;background-color: #6299FF;color:white;" 
+        onclick="$('input,textarea').val('');">Limpiar Registro</span>&nbsp;&nbsp;
+        <span style="padding: 10px;cursor: pointer;background-color: #E17474;color:white;" 
+        onclick="window.location.href='/${rdr}'">Cancelar</span>&nbsp;&nbsp;`;
+
+        if(  typeof user != "undefined" ){
+          dhg+=`<span style="padding: 10px;cursor: pointer;background-color: #D86AC7;color:white;" 
+          onclick="$('input[name=attention_phone]').val( 'true' );$('#submit1').click();">Atendido por telefono</span>`;
+        }
+     dhg+=` 
+      </td>
+    </tr>
+  </table>
+</form>
+<script>
+var user_list = [];
+$(document).ready(function() {
+  // $.post('/user_list', {param1: 'value1'}, function(dt, textStatus, xhr) {
+  //   //optional stuff to do after success 
+  //   for( i in dt ){
+      
+  //     user_list[dt[i].id_usuario] = dt[i].usuario_name;
+  //   }
+  // });
+    if( "${params.dni}" != "undefined" ){
+      $("#title_form").html("DATOS DE ATENCIÓN");
+      $( "input[name=dni]" ).val("${params.dni}");
+      $("#options_btn").hide();
+      $("input,select,textarea").attr("disabled",true);
+      $("#type_attention").hide();
+      $("#verify").hide();
+      $("#regisDoc").hide();
+      verificar();
+      
+    }
+});
+// alert('${params.dni}');
+
+    $( "#target" ).submit(function( event ) {
+      var ok = true;
+      if ( $( "input[name=dni]" ).val().length != 8 ) {
+        alert("Dni tiene que tener 8 digitos");
+        ok = false;
+      }
+      if ( $( "input[name=nombres]" ).val() == "" ) {
+        alert("Nombre Vacio!");
+        ok = false;
+      }
+      if ( $( "input[name=telefono]" ).val() == "" ) {
+        alert("Nro de telefono Vacio!");
+        ok = false;
+      }
+      if ( $( "input[name=edad]" ).val() == "" ) {
+        alert("Campo edad Vacio!");
+        ok = false;
+      }
+      if( $("#identidad").val() == "" ){
+        alert("Identidad no seleccionada!");
+        ok = false;
+      }
+      if( $("#aspira_beca").val() == "" ){
+        alert("Beca o Aspira a beca no seleccionada!");
+        ok = false;
+      }
+      if( $("input[name=lugar]").val() == "" ){
+        alert("Campo lugar Vacio!");
+        ok = false;
+      }
+      if( $("#motivo").val() == "" ){
+        alert("Motivo no seleccionado!");
+        ok = false;
+      }
+      if( $("#motivo").val() == "0" && $("#motivo_name").val() == "" ){
+        alert("Campo de motivo especificado Vacio!");
+        ok = false;
+      }
+      if( $("input[name=sexo]:checked").length == 0 ){
+        alert("Seleccione el Genero de la Persona");
+        ok = false;
+      }
+
+
+      // if( $("input[name=attention_phone]").val() == "true" ){
+
+      //   ok = true;
+      // }
+
+      if( ok ) return; // en caso que todo este correcto se realiza el envio.
+
+    // alert( "Porfavor complete los campos indicados" );
+    event.preventDefault();
+  });
+    $("#motivo").change(function(){
+      // alert($(this).val());
+      $("#motivo_name").val( $("#motivo option:selected").text() );
+      if( $(this).val() == "0" ){
+        $("#motivo_name").val("");
+        $("#motivo_especificado_tr").show();
+        $("#motivo_especificado").focus();
+      }else{
+        
+        $("#motivo_especificado_tr").hide();
+      }
+    });
+    function verificar(){
+      
+      if( $("input[name=dni]").val().length > 7 && $("input[name=dni]").val().length < 9 ){
+      // alert("${params.id_attention}");
+        // alert($("input[name=dni]").val().length);
+        // alert(${params.id_attention});
+        $.post('/checkAttention', { 
+          dni: $("input[name=dni]").val()
+          ,id_attention: ${params.id_attention} 
+        }, function(dt, textStatus, xhr) {
+          // console.log(dt);
+          // console.log(dt.length);
+          if(dt.length == 0){
+            // alert("No existe, porfavor registre sus datos");
+            return;
+          } 
+          $("input[name=nombres]").val( dt.nombres );
+          $("input[name=telefono]").val( dt.telefono );
+          $("input[name=edad]").val( dt.edad );
+          $("input[name=correo]").val( dt.correo );
+          $("textarea[name=identity_description]").val( dt.identity_description );
+          $("#identidad").val( dt.identidad );
+          $("#aspira_beca").val( dt.aspira_beca );
+          if( dt.sexo == false )
+            $('#sexo1[value=false]').attr('checked', true); 
+
+          console.log("entro123456");
+          if( "${params.dni}" != "undefined" ){
+            $("#motivo").val(dt.motivo);
+            var fecha = dt.fecha.split("T")[0];
+            // alert(fecha);
+            $("#fecha").val(fecha);
+            $("#hora").val(dt.hora);
+            // alert(dt.observacion);
+            $("#observacion1").val(dt.observacion);
+            $("#resumen1").val(dt.resumen);
+            // if( dt.reenvio_user )
+            //   $("#usuario_name").val(user_list[dt.id_usuario]);
+            // else
+            $("#usuario_name").val(dt.usuario_name);
+
+          }
+          // alert(dt.lugar);
+          $("input[name=lugar]").val( dt.lugar );
+        });
+      }
+    }
+      var allBecas = "";
+      var b_pregrado = '<option value="BECA 18">BECA 18</option><option value="BECA HIJO DE DOCENTES">BECA HIJO DE DOCENTES</option><option value="BECA VOCACIÓN MAESTRO">BECA VOCACIÓN MAESTRO</option><option value="BECA EXCELENCIA INTERNACIONAL">BECA EXCELENCIA INTERNACIONAL</option><option value="BECA EXCELENCIA INTERNACIONAL FRANCIA">BECA EXCELENCIA INTERNACIONAL FRANCIA</option>';
+      var b_especiales = '<option value="BECA PARA CASOS SOCIALES">BECA PARA CASOS SOCIALES</option><option value="BECA PERÚ">BECA PERÚ</option><option value="BECA PERMANENCIA">BECA PERMANENCIA</option><option value="BECA DOBLE OPORTUNIDAD">BECA DOBLE OPORTUNIDAD</option><option value="BECA PERMANENCIA CONSERVATORIO NACIONAL DE MUSICA">BECA PERMANENCIA CONSERVATORIO NACIONAL DE MUSICA</option><option value="BECA DE AMISTAD PERUANO ECUATORIANA">BECA DE AMISTAD PERUANO ECUATORIANA</option><option value="ALIANZA DEL PACÍFICO">ALIANZA DEL PACÍFICO</option><option value="BECA UNILA">BECA UNILA</option><option value="BECA PORTUGUÉS">BECA PORTUGUÉS</option><option value="BECA INGLÉS">BECA INGLÉS</option><option value="BECA TÉCNICO PRODUCTIVO">BECA TÉCNICO PRODUCTIVO</option><option value="BECA INGLES PARA ESCOLARES">BECA INGLES PARA ESCOLARES</option><option value="BECA COMPLEMENTARIA">BECA COMPLEMENTARIA</option>';
+      var b_posgrado = '<option value="BECA PRESIDENTE DE LA REPUBLICA">BECA PRESIDENTE DE LA REPUBLICA</option><option value="BECA DOCENTE">BECA DOCENTE</option><option value="BECA DE ESPECIALIZACIÓN EN EDUCACIÓN FÍSICA">BECA DE ESPECIALIZACIÓN EN EDUCACIÓN FÍSICA</option><option value="FRANCO PERUANA">FRANCO PERUANA</option><option value="ALEPRONA">ALEPRONA</option><option value="BECA REPROCIDAD PERÚ-CHINA">BECA REPROCIDAD PERÚ-CHINA</option><option value="BECA REPROCIDAD PERÚ-COLOMBIA">BECA REPROCIDAD PERÚ-COLOMBIA</option>';
+      var nose = '<option>OTROS</option>';
+      var nose1 = '<option>- -</option>';
+      allBecas = "<option value=''>seleccionar...</option><option value='OTROS'>OTROS</option><option>CREDITO EDUCATIVO</option>"+b_pregrado+""+b_especiales+""+b_posgrado;
+    $(document).ready(function() {
+      // alert("ghola");
+      // $("select[name=aspira_beca]").html( b_pregrado );
+      $("select[name=aspira_beca]").html( allBecas );
+    });
+    $("#rubro_beca").change(function(e) {
+      /* Act on the event */
+      // alert( $(this).val() );
+      $("select[name=aspira_beca]").html( eval($(this).val()) );
+    });
+    $("#submit_none").submit(function(){
+      return false;
+    });
+
+  </script>
+`;
+return dhg;
+}%>
+<% block('document_received_view').append(`
+	<style> 
+		table td,th { 
+			padding:16px 6px; 
+		} 
+		table tr:hover{
+			background-color:yellow;
+		} 
+	</style>
+	<img src="ico/back.png" width='80' style="margin-left:;" title="Volver" onclick="window.history.back()">&nbsp;&nbsp;
+	<br>
+  <div align='center' style='font-size:25px;'>
+    Registros de Documentos Recibidos
+  </div>
+  
+	<br>
+  <table border=1 bgcolor=white cellspacing=0 style='border-color:#E3E3E3;' width='100%' id='drec_view_tb'>
+		<tr>
+			<th>Nro</th>
+			<th>NOMBRES</th>
+			<th>Telf.Referencia</th>
+			<th>Institución</th>
+			<th>Codigo</th>
+			<th>Lugar</th>
+			<th>Registrado</th>
+		</tr>
+	</table>
+	<script>
+	$(document).ready(function() {
+		$.post('/viewShipments', {param1: 'value1'}, function(dt, textStatus, xhr) {
+			/*optional stuff to do after success */
+			var date = dt[0].date1.split("T")[0];
+			var dh="";
+			for( i in dt ){
+				dh+="<tr title='Asunto: "+dt[i].affair+", Dirigido a: "+dt[i].addressed+"'><td>"+(parseInt(i)+1)+"</td>"
+				+"<td>"+dt[i].nombres+"</td>"
+				+"<td>"+dt[i].phone_ref+"</td>"
+				+"<td>"+dt[i].name_inst+"</td>"
+				+"<td>"+dt[i].code+"</td>"
+				+"<td>"+dt[i].place+"</td>"
+				+"<td>"+dt[i].time1+" , "+date+"</td>"
+				+"</tr>"
+				;
+			}
+			$("#drec_view_tb").append(dh);
+		});
+	});
+	
+
+	</script>
+`)%>
+<% block('document_received').append(`
+  <table border="1" width="100%" cellspacing=0 id=tb-regis style="border-color:#DFDFDF;">
+    <tr>
+      <td colspan="2">
+          <img src="ico/back.png" width='80' style="margin-left:;" title="Volver" onclick="window.history.back()">
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <th colspan=2 align="center" style="text-align: center;">
+        <div>REGISTRO DE DOCUMENTOS</div>
+      </th>
+    </tr>
+    <tr>
+      <td>Dni:</td>
+      <td>
+        <div class="form-inline">
+            <input type="text" id="dni" value="" class="form-control" onkeyup="verificar();">
+            <span class="form-control" onclick="verificar();" style="cursor:pointer;" id="verify">Verificar</span>    
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td width=200>Nombres</td>
+      <td><input type="text" id="nombres" value="" class="form-control"></td>
+    </tr>
+    <tr>
+      <td width=200>Intitución</td>
+      <td><input type="text" id="name_inst" value="" class="form-control"></td>
+    </tr>
+    <tr>
+      <td>Codigo de Documento:</td>
+      <td><input type="text" id="code" value="" class="form-control"></td>
+    </tr>
+    
+    <tr>
+      <td>Telefono de Institución:</td>
+      <td><input type="text" id="phone_ref" value="" class="form-control"></td>
+    </tr>
+
+    <tr>
+      <td>Lugar:</td>
+      <td><input type="text" id="place" value="" class="form-control"></td>
+    </tr>
+    <tr>
+      <td>Asunto:</td>
+      <td><input type="text" id="affair" value="" class="form-control"></td>
+    </tr>
+
+    <tr>
+      <td>Dirigido a:</td>
+      <td>
+		<select id="addressed" class="form-control">
+			<option value="0">SELECCIONE</option>
+			<option value="JEFE DE LA UNIDAD DE ENLACE REGIONAL MOQUEGUA">JEFE DE LA UNIDAD DE ENLACE REGIONAL MOQUEGUA</option>
+			<option value="ESPECIALISTA EN BECAS Y CREDITO EDUCATIVO">ESPECIALISTA EN BECAS Y CREDITO EDUCATIVO</option>
+			<option value="ESPECIALISTA EN COMUNICACIONES">ESPECIALISTA EN COMUNICACIONES</option>
+			<option value="PRONABEC">PRONABEC</option>
+		</select>
+      </td>
+    </tr>
+    
+    <tr>
+      <td colspan="2" align="center">
+        <br>
+        <button style="padding: 5px;cursor: pointer;background-color: #5475C8;color:white;" onclick="saveShipping()">Registrar</button>&nbsp;&nbsp;
+        <span style="padding: 10px;cursor: pointer;background-color: #6299FF;color:white;" 
+        onclick="$('input,textarea').val('');">Limpiar Registro</span>&nbsp;&nbsp;
+        <span style="padding: 10px;cursor: pointer;background-color: #E17474;color:white;" onclick='window.history.back()'>Cancelar</span>
+      </td>
+    </tr>
+  </table>
+<script>
+function saveShipping(){
+
+	if( $("#addressed").val() == "" ){
+		alert("Porfavor, seleccione el area al cual se envio el documento");
+		return;
+	}
+
+	$.post('/saveShipping', {
+		dni: $("#dni").val()
+		,nombres: $("#nombres").val()
+		,phone_ref: $("#phone_ref").val()
+		,name_inst: $("#name_inst").val()
+		,code: $("#code").val()
+		,affair: $("#affair").val()
+		,place: $("#place").val()
+		,addressed: $("#addressed").val()
+	}, function(dt, textStatus, xhr) {
+		/*optional stuff to do after success */
+		if(dt.success){
+			alert("Se registro con exito");
+			$('input,textarea').val('');
+			$("#addressed").val("");
+		}
+		else
+			alert("error al registrar, verifique sus datos");
+		// console.log(dt);
+	});
+}
+function verificar(){
+  // alert("entro");
+  if( $("#dni").val().length > 7 && $("#dni").val().length < 9 ){
+    // alert($("input[name=dni]").val().length);
+    $.post('/checkShipments', { dni: $("#dni").val() }, function(dt, textStatus, xhr) {
+      console.log(dt);
+      // console.log(dt.length);
+      if(dt.length == 0){
+        alert("No existe, porfavor registre sus datos");
+        return;
+      } 
+      $("#nombres").val( dt.nombres );
+      $("#name_inst").val( dt.name_inst );
+      $("#code").val( dt.code );
+      // $("#affair").val( dt.affair );
+      $("#phone_ref").val( dt.phone_ref );
+      $("#place").val( dt.place );
+
+    });
+  }
+}
+</script>
+	
+`)%>

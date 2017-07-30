@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Chat Pronabec</title>
+<script src="js/socket.io.js"></script>
+<script src="js/jquery-1.9.1.js"></script>
+<style>
+	body{
+		margin:0;
+		overflow-x: hidden; 
+	}
+</style>
+</head>
+<body>
+
+
+	<% if( typeof params.cwri != 'undefined'){ %>
+		<%-chat_write()%>
+	<% }else if( typeof params.clis != 'undefined'){ %>
+		<%
+			var data1 = lib.Deasync(function(callback){
+				model.user.user_list({},function(obj1){
+					callback(null,obj1);
+				});
+			})();
+
+			var cantmsn_forme = lib.Deasync(function(callback){
+				model.chat.cantmsn_forme({id_usuario: usuario.id_usuario},function(obj1){
+					callback(null,obj1);
+				});
+			})();
+			for( i in data1 ){
+				var into = false,into_index;
+				for( ii in cantmsn_forme ){
+					if( data1[i].id_usuario == cantmsn_forme[ii].user_emit ){
+						into = true;
+						into_index = ii;
+					}
+
+				}
+				if(into)
+					data1[i].cant = "<span class='cant_msn'>"+cantmsn_forme[into_index].count+"</span>";
+				else
+					data1[i].cant="";
+			}
+
+		%>
+		<%-chat_list(data1)%>
+	<% }else if( typeof params.uinf != 'undefined'){ %>
+
+			<%
+				var data1 = lib.Deasync(function(callback){
+					model.user.user_allData({id_usuario:params.id_user},function(obj1){
+						callback(null,obj1);
+					});
+				})();
+			%>
+			<%-user_info(data1)%>
+	<% }else{ %>
+		<!-- Contenido de inicio -->
+		<div>
+			<p>Bienvenidos a Chat Institucional v.1.0</p>
+			<%-block('access') %>
+		</div>
+
+
+	<%}%>
+<script>
+var cont2 =0;
+<% if( typeof usuario != "undefined"){%>
+	// var audioElement;
+	// audioElement = document.createElement('audio');
+	// audioElement.setAttribute('src', 'sound/tucutin1.mp3');
+
+	var ws = io();
+	$(document).on("ready", function(){
+		<% if( typeof params.cwri != "undefined"){%>
+			msn_waiting("cwri");
+		<%}%>
+		<% if( typeof params.uinf != "undefined"){%>
+			msn_waiting("uinf");
+		<%}%>
+		ws.on('chat_msn_res', function(dt){
+			// if( dt.user_recept == <%=usuario.id_usuario%> ){
+			// 	cont2++;
+			// }
+			if(dt.user_recept == <%=usuario.id_usuario%> && dt.user_emit == <%=params.id_user%> ){
+				// if(cont2 == 1){
+					// audioElement.currentTime = 0;
+				 //    audioElement.play();					
+				// }
+				
+			    view_min_msnXuser();
+			}else{
+				if(dt.user_recept == <%=usuario.id_usuario%>){
+					cont2++;
+				}
+			}
+			
+			<% if( typeof params.clis != "undefined"){%>
+				msn_waiting("clis");
+			<%}%>
+			<% if( typeof params.cwri != "undefined"){%>
+				msn_waiting("cwri");
+			<%}%>
+			
+
+
+		});
+		ws.on('chat_viewed_res', function(dt){
+			if(dt.user_recept == <%=params.id_user%> && dt.user_emit == <%=usuario.id_usuario%> ){
+				viewed_verify();
+			}
+		});
+
+	});
+	$(document).ready(function() {
+		// msn_waiting();
+	});
+	var user_emit = 0;
+	<% if( typeof params.id_user != "undefined"){%>
+		user_emit = <%=params.id_user%>
+	<%}%>
+
+	function msn_waiting(tipo){
+		if(cont2 == 1){
+			// alert("jaja");
+			// audioElement.currentTime = 0;
+			// audioElement.play();
+		}	
+		switch(tipo){
+			case 'clis':
+				$.post('/msn_waiting', {id_usuario: <%=usuario.id_usuario%>,user_emit: user_emit}, function(dt, textStatus, xhr) {
+					location.reload();
+				});
+				break;
+
+			case 'cwri':
+				$.post('/msn_waiting', {id_usuario: <%=usuario.id_usuario%>,user_emit: user_emit}, function(dt, textStatus, xhr) {
+					// location.reload();
+					if( dt[0].count == 0 )
+						$("#alerta_msn").hide();
+					else{
+						$("#alerta_msn").show().html(dt[0].count);
+					}
+				});
+				break;
+			case 'uinf':
+				$.post('/msn_waiting', {id_usuario: <%=usuario.id_usuario%>,user_emit: user_emit}, function(dt, textStatus, xhr) {
+					// location.reload();
+					if( dt[0].count == 0 )
+						$("#alerta_msn").hide();
+					else
+						$("#alerta_msn").show().html(dt[0].count);
+				});
+				break;
+		}
+		
+	}
+<% }%>
+</script>
+</body>
+</html>

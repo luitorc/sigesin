@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registro</title>
+  
+  <%-init.head%>
+  <style>
+      #tb-regis td{
+        padding: 4px 10px;
+      }
+
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+<%-init.foot%>
+  <% if( typeof params.ureg != "undefined" ){ %>
+    <%-user_register()%>
+  <%}%>
+  <% if( typeof params.drec != "undefined"  ){ %>
+    <%-block('document_received') %>
+  <%}%>
+  <% if( typeof params.drec_v != "undefined"  ){ %>
+    <%-block('document_received_view') %>
+  <%}%>
+</div>
+  
+</body>
+</html>

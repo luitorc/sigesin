@@ -1,0 +1,142 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <!-- <script src="js/jquery-1.9.1.js"></script> -->
+   
+   <%init.head%>
+   <script type="text/javascript" src="js/socket.io.js"></script>
+</head>
+
+<body>
+  <nav class="navbar navbar-full navbar-light bg-faded">
+    <a class="navbar-brand" href="#">SIGSOIN</a>
+    <ul class="nav navbar-nav pull-right">
+      <li class="nav-item">
+        <a class="nav-link" href="/">Inicio</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Servicio</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Acerca de nosotros<br></a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="/login">Ingresar<br></a>
+      </li>
+    </ul>
+  </nav>
+  <br>
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-5">
+          <h3 class="text-xs-center">Registro de Usuario</h3>
+          <img class="center-block img-fluid" src="img\registro-1.png" style="width:200px">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th class="text-muted">¿Que beneficios tendre como Usuario?</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <i class="center-block fa fa-2x fa-check fa-fw text-success"></i>
+                  </td>
+                  <td class="text-success">Disposición del SIGEDO - MOQUEGUA</td>
+                </tr>
+                <tr>
+                  <td>
+                    <i class="center-block fa fa-2x fa-check fa-fw text-success"></i>
+                  </td>
+                  <td class="text-success">Solución de inmediata a problemas informaticos</td>
+                </tr>
+                <tr>
+                  <td>
+                    <i class="center-block fa fa-2x fa-check fa-fw text-success"></i>
+                  </td>
+                  <td class="text-success">Disposición de consultorias tecnicos e informaticos</td>
+                </tr>
+                <tr>
+                  <td>
+                    <i class="center-block fa fa-2x fa-check fa-fw text-success"></i>
+                  </td>
+                  <td class="text-success">Recomendaciones a disposición</td>
+                </tr>
+                <tr>
+                  <td>
+                    <i class="center-block fa fa-2x fa-check fa-fw text-success"></i>
+                  </td>
+                  <td class="text-success">Lista de problemas con soluciones realizadas</td>
+                </tr>
+                <tr>
+                  <td>
+                    <i class="center-block fa fa-2x fa-check fa-fw text-success"></i>
+                  </td>
+                  <td class="text-success">Y muchas cosas mas que se vienen</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="col-lg-7 ">
+          <div class="form-group">
+            <label>ID</label>
+            <input type="email" class="form-control" placeholder="" disabled="">
+          </div>
+          <div class="form-group">
+            <label>Nombres</label>
+            <input type="email" class="form-control" placeholder="Escriba aqui sus nombres">
+          </div>
+          <div class="form-group">
+            <label>Apellidos</label>
+            <input type="email" class="form-control" placeholder="Escriba aqui sus Apellidos">
+          </div>
+          <div class="form-group">
+            <label>Celular 1</label>
+            <input type="email" class="form-control" placeholder="Escriba aqui su numero de celular">
+          </div>
+          <div class="form-group">
+            <label>Celular 2</label>
+            <input type="email" class="form-control" placeholder="Escriba aqui su otro numero de celular (Opcional)">
+          </div>
+          <div class="form-group">
+            <label>Correo Electronico</label>
+            <input type="email" class="form-control" placeholder="Escriba aqui su correo electronico">
+          </div>
+          <div class="form-group">
+            <label>Dirección</label>
+            <input type="email" class="form-control" placeholder="Escriba aqui su dirección">
+          </div>
+          <div align="center">
+            <a href="#" class="btn btn-lg btn-primary" style="margin:auto;">Registrarme</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <hr class="" draggable="true">
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+     $(document).ready(function() {
+       alert("hola mundo");
+     });
+   </script>
+<%init.foot%>
+
+
+
+</body>
+
+</html>

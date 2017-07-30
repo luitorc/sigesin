@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>RENIEC</title>
+  <style>
+body {font-family: "Lato", sans-serif;}
+
+/* Style the tab */
+div.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+div.tab button {
+
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+div.tab button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+div.tab button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    -webkit-animation: fadeEffect 1s;
+    animation: fadeEffect 1s;
+}
+
+/* Fade in tabs */
+@-webkit-keyframes fadeEffect {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+@keyframes fadeEffect {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+</style>
+  <style>
+    body{
+      background-color: #F0F0F0;
+    }
+    #dni_r{
+      /*background-color: #DCE3FF;*/
+      /*padding: 20px;*/
+      /*border-radius: 20px;*/
+    }
+    #ruc_r{
+      /*background-color: #DCE3FF;*/
+      /*padding: 30px;*/
+      /*border-radius: 20px;*/
+    }
+    .container{
+      width: 100%;
+      margin:auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <div align="center">
+  	 <h2>Verificación de Identidad</h2>
+    </div>
+
+  	
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    
+    
+    
+  </div>
+
+
+<div class="tab">
+  <button class="tablinks" onclick="openBase(event, 'dni_content')" id='btn_dni'>DNI</button>
+  <button class="tablinks" onclick="openBase(event, 'ruc_content')" id='btn_ruc'>RUC</button>
+</div>
+
+<div id="dni_content" class="tabcontent" align="center">
+  <h3>Identificación de DNI</h3>
+  <div id="dni_r" align="center"> 
+      <input type="text" id="dni" placeholder="DNI" autofocus="true">
+      <button onclick="window.location.href='?type=DNI&nro='+$('#dni').val()">Consultar</button>
+      <br>
+
+      <br>
+      <div id='consulta' style="font-size:20px;"></div>
+      
+      <label for="">Apellido Paterno</label> 
+      <br>
+      <input type="text" id="apellido_materno" style="font-size: ;width: 280px"  >
+      <br>
+      <label for="">Apellido Materno</label> 
+      <br>
+      <input type="text" id="apellido_paterno" style="font-size: ;width: 280px"  >
+      <br>
+      <label for="">Nombres</label> 
+      <br>
+      <input type="text" id="nombres" style="font-size: ;width: 280px"  >
+      <br>
+      <label for="">Caracter de Verificación</label> 
+      <br>
+      <input type="text" id="caracter_verificacion" style="font-size: ;width: 280px"  >
+      <br>
+      <label for="">Caracter de Verificación Anterior</label> 
+      <br>
+      <input type="text" id="caracter_verificacion_anterior" style="font-size: ;width: 280px"  >
+      <br>
+      
+      
+    </div>
+</div>
+
+<div id="ruc_content" class="tabcontent" align="center">
+  <h3>Identificación de RUC</h3>
+  <div id="ruc_r" align="center"> 
+      <input type="text" id="ruc" placeholder="DNI" onkeyup="if(event.keyCode == 13 ){query(this.value, 'DNI');}"><button onclick="window.location.href='?type=RUC&nro='+$('#ruc').val()">Consultar</button>
+      <!-- <input type="text" id="ruc" placeholder="DNI" onkeyup="if(event.keyCode == 13 ){query(this.value, 'DNI');}"><button onclick="query(null,'RUC')">Consultar</button> -->
+      <br><br>
+      <label for="">Actividad de Comercio Exterior</label> 
+      <br>
+      <input type="text" id="actividad_comercio_exterior" style="font-size: ;width: 280px"  >
+      <br>
+      <label for="">Condición de Contribuyente</label> 
+      <br>
+      <input type="text" id="condicion_contribuyente" style="font-size: ;width: 280px"  >
+      <br>
+      <label for="">Dirección</label> 
+      <br>
+      <input type="text" id="direccion" style="font-size: ;width: 280px"  >
+      <br>
+      <label for="">Estado de Contribuyente</label> 
+      <br>
+      <input type="text" id="estado_contribuyente" style="font-size: ;width: 280px"  >
+      <br>
+      <label for="">Fecha de Inicio de Actividades</label> 
+      <br>
+      <input type="text" id="fecha_inicio_actividades" style="font-size: ;width: 280px"  >
+      <br>
+      <label for="">Fecha de Inscripción</label> 
+      <br>
+      <input type="text" id="fecha_inscripcion" style="font-size: ;width: 280px"  >
+      <br>
+      <label for="">Nombre Comercial</label> 
+      <br>
+      <input type="text" id="nombre_comercial" style="font-size: ;width: 280px"  >
+      <br>
+      <label for="">Razon Social</label> 
+      <br>
+      <input type="text" id="razon_social" style="font-size: ;width: 280px"  >
+      <br>
+      <label for="">Sistema de Contabilidad</label> 
+      <br>
+      <input type="text" id="sistema_contabilidad" style="font-size: ;width: 280px"  >
+      <br>
+      <label for="">Sistema de Emisión de Comprobante</label> 
+      <br>
+      <input type="text" id="sistema_emision_comprobante" style="font-size: ;width: 280px"  >
+      <br>
+      <label for="">Tipo de Contribuyente</label> 
+      <br>
+      <input type="text" id="tipo_contribuyente" style="font-size: ;width: 280px"  >
+    </div>
+</div>
+
+	<script src="https://tecactus-4b42.kxcdn.com/reniec-sunat-js.min.js"></script>
+    <!-- Ejemplo -->
+    <script>
+      var tecactusApi = new TecactusApi("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjA0YmU0N2QxOTliNTk1MzY0NmI2OGZiZTVmYmI4YWRiMjI0YjI4NzQxNjg5ZTM0OGZmYTQ2NzQ2MmNhMTgxMmIyZWE2ZWMxZGQwYzg2NmU2In0.eyJhdWQiOiIxIiwianRpIjoiMDRiZTQ3ZDE5OWI1OTUzNjQ2YjY4ZmJlNWZiYjhhZGIyMjRiMjg3NDE2ODllMzQ4ZmZhNDY3NDYyY2ExODEyYjJlYTZlYzFkZDBjODY2ZTYiLCJpYXQiOjE0OTMwMDU5MDgsIm5iZiI6MTQ5MzAwNTkwOCwiZXhwIjoxODA4NTM4NzA4LCJzdWIiOiIyMTQiLCJzY29wZXMiOlsidXNlLXJlbmllYyIsInVzZS1zdW5hdCJdfQ.nXB14P7xtPoxZma3qd2s5w9LRW_xKXq6bf8GjcS4RzKdeRRsPYf5C28NxGR9xHQx30DEW_eqKZMllI36AyCTpJ6D1bZnfh6Dz2NPx7utQRfRF804WDFI2qJ9Q0V3wXpzkG_2zAP-4f7ACjeASpcyrBTHQPTKY5U4C1wtykRgTpEgXTDveqTLU5iX1PJ0jBFQi35rdZriJITyAvZKJgdYAGQ8vajxnQGkeBeWcxTSMlhHO2O69bpf6NOp2IkOpaUWDHJLAFTmLrAbwm2guXHhhzT5T_PqBJorhwj3jev0Iihe0ZKVcsDkv8tHoy5bEbGBS8eGeKZbp9ZINV-rgMI_24rejSiGMmWHC58Te3MDAzZ719DCQSyieM4v03wp9Ljbr4fyJfcdUWWlzy3H9feoJXdEkLIQW12mgdJWtOu0vGWqJpHCuJc0Dfzu98lx2xj8csllgY4LE5ebo3tFF9gUmkGxP-Lrr5m_qhzF4_AjO2UKS_2txwXJyuP-7wvZfwHhwY6SZ5qUdpkm2g0g1HpQZPKn3n7HLClVJz296iiejGmtwfotZUBwGwWJ8zdzwaSB0qsb-c6CqbNHRjogmKFFyuWRpl_G3djOyiBSbt2_pUEf76umjIqeKsObn5AM6x6Oauale-XYoEn_3t-t0SD8DTybuS9Sl8HDd5-N0QcXf0U");
+      
+      // var data_dni = {
+      //   apellido_materno:"CARPIO"
+      //   ,apellido_paterno:"TORRES"
+      //   ,caracter_verificacion:"2"
+      //   ,caracter_verificacion_anterior:"G"
+      //   ,dni:"70934749"
+      //   ,nombres:"LUIS MANUEL"
+      // }                      
+      // var data_ruc = {
+      //   actividad_comercio_exterior:"SIN ACTIVIDAD"
+      //   ,condicion_contribuyente:"HABIDO"
+      //   ,direccion:"MZA. C LOTE. 4 P.J. BELLO HORIZONTE MOQUEGUA - ILO - ILO"
+      //   ,estado_contribuyente:"ACTIVO"
+      //   ,fecha_inicio_actividades:"26-07-2016"
+      //   ,fecha_inscripcion:"26-07-2016"
+      //   ,nombre_comercial:"-"
+      //   ,razon_social:"TORRES CARPIO LUIS MANUEL"
+      //   ,ruc:10709347492
+      //   ,sistema_contabilidad:"COMPUTARIZADO"
+      //   ,sistema_emision_comprobante:"COMPUTARIZADO"
+      //   ,tipo_contribuyente:"PERSONA NATURAL SIN NEGOCIO"
+      // }
+      var nombres, apellidos;
+
+      <%if(type!=undefined){%>
+        query('<%=nro%>','<%=type%>');
+      <%}%>
+      function query(nro_doc, type){
+        console.log(nro_doc+" "+type);
+        if( nro_doc == null){
+          if( type == "DNI" )
+            nro_doc = $("#dni").val();
+          else
+            nro_doc = $("#ruc").val();
+        }
+        switch(type){
+          case 'DNI':
+            
+            tecactusApi.Reniec.getDni(nro_doc)
+            .then(function (response) {
+                console.log("consulta correcta!");
+                console.log(response.data);
+                var dt = response.data;
+                $("#apellido_materno").val(dt.apellido_materno);
+                $("#apellido_paterno").val(dt.apellido_paterno);
+                $("#caracter_verificacion").val(dt.caracter_verificacion);
+                $("#caracter_verificacion_anterior").val(dt.caracter_verificacion_anterior);
+                $("#nombres").val(dt.nombres);
+
+            })
+            .catch(function (response) {
+                console.log("algo ocurrió")
+                console.log("código de error: " + response.code);
+                console.log("mensaje de respuesta: " + response.status);
+                console.log(response.data);
+            });
+            // apellidos = dt.apellido_paterno+" "+dt.apellido_materno;
+            // nombres = dt.nombres;
+            
+            break;
+
+          case 'RUC':
+            
+            tecactusApi.Sunat.getByRuc(nro_doc)
+            .then(function (response) {
+                console.log("consulta correcta!");
+                console.log(response.data);
+                dt = response.data;
+                console.log(dt);
+                $("#actividad_comercio_exterior").val(dt.actividad_comercio_exterior);
+                $("#condicion_contribuyente").val(dt.condicion_contribuyente);
+                $("#direccion").val(dt.direccion);
+                $("#estado_contribuyente").val(dt.estado_contribuyente);
+                $("#fecha_inicio_actividades").val(dt.fecha_inicio_actividades);
+                $("#fecha_inscripcion").val(dt.fecha_inscripcion);
+                $("#nombre_comercial").val(dt.nombre_comercial);
+                $("#razon_social").val(dt.razon_social);
+                $("#ruc").val(dt.ruc);
+                $("#sistema_contabilidad").val(dt.sistema_contabilidad);
+                $("#sistema_emision_comprobante").val(dt.sistema_emision_comprobante);
+                $("#tipo_contribuyente").val(dt.tipo_contribuyente);
+            })
+            .catch(function (response) {
+                console.log("algo ocurrió");
+                console.log("código de error: " + response.code);
+                console.log("mensaje de respuesta: " + response.status);
+                console.log(response.data);
+            });
+
+            break;
+        }
+        
+      }
+    </script>
+    <script>
+    $(document).ready(function() {
+        // $("#btn_dni").click();
+        openBase(null,'dni_content');
+    });
+function openBase(evt, type) {
+    if(evt==null){
+      $("#btn_dni").addClass('active');
+      document.getElementById(type).style.display = "block";
+      evt.currentTarget.className += " active";
+      return;
+    }
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(type).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+</script>
+</body>
+</html>

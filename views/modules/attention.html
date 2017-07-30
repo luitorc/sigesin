@@ -1,0 +1,337 @@
+<% layout('modules/layout/attention.html') %>
+
+<% view_graphic = function(){
+	//vgra
+	var dhg = `
+		${init.jquery}
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.2/raphael-min.js"></script>
+		<script src="lib/morris.js-0.5.1/morris.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/prettify/r224/prettify.min.js"></script>
+		<script src="lib/morris.js-0.5.1/examples/lib/example.js"></script>
+		<!-- <link rel="stylesheet" href="lib/morris.js-0.5.1/examples/lib/example.css"> -->
+		<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/prettify/r224/prettify.min.css">
+		<link rel="stylesheet" href="lib/morris.js-0.5.1/morris.css">
+		<script src="lib/luitor/toast.js"></script>
+		<div class="section">
+			<div class="container">
+				<a href="attention">
+					<img src="ico/back.png" width='80' style="margin-left:120px;position: absolute;margin-top:-10px;" title="Atras">
+				</a>
+			</div>
+		</div>
+		<br><br>
+		<div style='background: white;width: 80%;margin:auto;' align='center'>
+		Categoria: 
+			<select id="categoria">
+				<!-- <option value="">Seleccione...</option> -->
+				<option value="VISITA">VISITAS</option>
+				<option value="EDAD">EDAD</option>
+				<option value="LUGAR">LUGAR</option>
+				<option value="IDENTIDAD">IDENTIDAD</option>
+				<option value="BECA DE INTERES">BECA DE INTERES</option>
+				<option value="GENERO">GENERO</option>
+			</select>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<span id='mes_base' style='display: none;'>
+				Mes:
+				<select id="mes">
+					<option value="">Seleccione...</option>
+					<option value="01">ENERO</option>
+					<option value="02">FEBRERO</option>
+					<option value="03">MARZO</option>
+					<option value="04">ABRIL</option>
+					<option value="05">MAYO</option>
+					<option value="06">JUNIO</option>
+					<option value="07">JULIO</option>
+					<option value="08">AGOSTO</option>
+					<option value="09">SEPTIEMBRE</option>
+					<option value="10">OCTUBRE</option>
+					<option value="11">NOVIEMBRE</option>
+					<option value="12">DICIEMBRE</option>
+				</select>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>
+			Año:
+			<input type="text" id='anio' placeholder="Año">
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<button onclick="setGraph()">ACTUALIZAR</button>
+
+		<br><br>
+			<div align='center' style='font-size:25px;font-weight: bold;'>
+				<span id='lb_title_graph'></span>
+				<span id='lb_mes'></span>
+				<span id='lb_anio'></span>
+			</div>
+			<div id="graph" style="height: 400px;"></div>
+			<script>
+			// Use Morris.Bar
+ var mesName = ["","ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
+
+			$("#categoria,#mes").change(function(e) {
+				/* Act on the event */
+				var categoria = $(this).val();
+				console.log(categoria);
+				if( categoria == 'VISITA' ){
+					$("#mes_base").hide();
+					$("#lb_mes").hide();
+				}else{
+					$("#mes_base").show();
+					$("#lb_mes").show();
+				}
+
+				setGraph();
+			});
+			</script>
+		</div>
+	<script>
+	$(document).ready(function() {
+		var date1 = new Date();
+		$("#anio").val( date1.getFullYear() );
+		console.log(date1.getMonth());
+		$("#mes").val( ("0" + (parseInt(date1.getMonth())+1 )  ).slice(-2) );
+		// $("#mes").val( ate1.getMonth() );
+		
+	});
+		function setGraph(){
+			if( $('#anio').val().length != 4 ){
+				alert("Escriba el año correctamente, gracias");
+				return;
+			}
+			var categoria = $("#categoria").val();
+			console.log("entro: "+categoria);
+				toast("Procesando...",1);
+				$("#graph").html("");
+				
+				var dataArr = [];
+						$.post('/graphic', {
+							mes: $('#mes').val()
+							,anio: $('#anio').val()
+							,categoria: $('#categoria').val()
+						}, function(dt, textStatus, xhr) {
+							console.log(dt);
+							for( i in dt ){
+								var data1 = {};
+								switch( categoria ){
+									case 'VISITA':
+										data1.x = mesName[parseInt(dt[i].fecha1.split('-')[1])];
+										data1.y = dt[i].cant;									
+										break;
+									case 'EDAD':
+										data1.x = dt[i].edad;
+										data1.y = dt[i].cant;		
+										$("#lb_mes").html(mesName[parseInt($('#mes').val())]);		
+										break;
+									case 'LUGAR':
+										if(dt[i].lugar1 == null || dt[i].lugar1 == '')
+											dt[i].lugar1 = 'Otros';
+										data1.x = dt[i].lugar1;
+										data1.y = dt[i].cant;		
+										$("#lb_mes").html(mesName[parseInt($('#mes').val())]);		
+										break;
+									case 'IDENTIDAD':
+										if(dt[i].identidad == null || dt[i].identidad == '' || dt[i].identidad == ' ')
+											dt[i].identidad = 'Otros';
+
+										data1.x = dt[i].identidad;
+										data1.y = dt[i].cant;		
+										$("#lb_mes").html(mesName[parseInt($('#mes').val())]);		
+										break;
+									case 'BECA DE INTERES':
+										if(dt[i].aspira_beca == null || dt[i].aspira_beca == '')
+											dt[i].aspira_beca = 'Otros';
+										if( dt[i].aspira_beca == "NO ES BECARIO" )
+											dt[i].aspira_beca = "OTROS";
+										data1.x = dt[i].aspira_beca;
+										data1.y = dt[i].cant;		
+										$("#lb_mes").html(mesName[parseInt($('#mes').val())]);		
+										break;
+									case 'GENERO':
+										
+
+										if( dt[i].sexo == true )
+											dt[i].sexo = "Hombres";
+										else if( dt[i].sexo == false )
+											dt[i].sexo = "Mujeres";
+										else if(dt[i].aspira_beca == null || dt[i].aspira_beca == '')
+											dt[i].sexo = 'No clasificado';
+
+										data1.x = dt[i].sexo;
+										data1.y = dt[i].cant;		
+										$("#lb_mes").html(mesName[parseInt($('#mes').val())]);		
+										break;
+								}
+
+								dataArr.push(data1);
+							}
+							console.log(dataArr.length);
+							if( dataArr.length == 0  ){
+								toast("No se encontraron registros",3);
+								console.log("No se encontraron registros");
+								if( categoria != "VISITA" ){
+									$("#lb_mes").html(mesName[parseInt($('#mes').val())]);
+								}else
+									$("#lb_mes").html("");
+								$("#lb_anio").html($('#anio').val());
+								return;
+							}
+							
+							process_graph(categoria,dataArr);
+							//set title
+							$("#lb_title_graph").html("<span style='color:blue;'>"+categoria+"</span> - ");
+							
+							$("#lb_anio").html($('#anio').val());
+							//para mostrar letras de indicadores
+							$("svg").css({"height":"800"});
+						});
+				
+		}
+		function process_graph(categoria, dataArr){
+			Morris.Bar({
+			  element: 'graph',
+			  data: dataArr,
+			  config: {
+			  	resize: true
+			  },
+			  xkey: 'x',
+			  ykeys: ['y'],
+			  labels: ['N° Visitas'],
+			  xLabelAngle: 60,
+			  resize: true,
+			  barColors: function (row, series, type) {
+			  	// console.log("--> "+row.label, series, type);
+			  	try{
+			  		switch(categoria){
+			  			case 'VISITA':
+			  				if(row.label == "ENERO") return "#AD1D28";
+							else if(row.label == "FEBRERO") return "#E54040";
+							else if(row.label == "MARZO") return "#E639BB";
+							else if(row.label == "ABRIL") return "#B450CD";
+							else if(row.label == "MAYO") return "#7F55EA";
+							else if(row.label == "JUNIO") return "#40B9DC";
+							else if(row.label == "JULIO") return "#4CD6B7";
+							else if(row.label == "AGOSTO") return "#47D47C";
+							else if(row.label == "SEPTIEMBRE") return "#6BE430";
+							else if(row.label == "OCTUBRE") return "#D7F243";
+							else if(row.label == "NOVIEMBRE") return "#F0CD2C";
+							else if(row.label == "DICIEMBRE") return "#FF8F44";
+			  				break;
+			  			// case 'EDAD':
+			  			// 	return get_random_color();
+			  			// 	break;
+			  			// case 'LUGAR':
+			  			// 	break;
+			  			default:
+			  				return get_random_color();
+			  				break;
+			  		}
+			  		
+			    
+			  	}catch(ex){
+			  		console.log(ex);
+			  	}
+			    return '#000';
+			    
+			  }
+			});
+		}
+		function get_random_color(){
+                var letters = '0123456789ABCDEF'.split('');
+                var color = '#';
+                for (var i = 0; i < 6; i++ ) {
+                    color += letters[Math.round(Math.random() * 15)];
+                }
+                return color;
+		}
+	</script>
+	<div class='my_toast1'></div>
+	<script>
+	  $(document).ready(function() {
+	    lt_toast('.my_toast1'); 
+	    setGraph()
+	  });
+	</script>
+	`;
+	return dhg;
+}
+%>
+<% view_previe = function(){
+
+	var dhg = `
+		${init.head}
+		<style> 
+			table td,th { 
+				padding:16px 10px; 
+			} 
+			table tr:hover{
+				background-color:yellow;
+			} 
+			.menu_base{
+				z-index: 23;
+				top:0;
+				position: fixed;
+				background-color: #F9F9F9;
+				width: 100%;
+			}
+		</style>
+		<div class='menu_base'>
+				&nbsp;&nbsp;<img src="ico/back.png" width='80' style="margin-left:;position:absolute" title="Volver" onclick="window.history.back()">
+			
+			<br>
+			<div align="center"> <input type="text" style="width: 50%;" id='word' onkeyup="if( event.keyCode== 13 ) view_attention('search')" placeholder='Buscador de Registros de Atenciones'> <button onclick="view_attention('search');">Buscar</button> </div><br>
+			<table border=1 bgcolor=white cellspacing=0 style='border-color:#E3E3E3;' width='100%'>
+				<tr>
+					<th width='5%'>Nro</th>
+					<th width='16%'>DNI</th>
+					<th width='30%'>Nombre y Apellidos</th>
+					<!-- <th width='10%'>Edad</th> -->
+					<th width='20%'>Motivo</th>
+					<th width='15%'>Registro</th>
+					<th>Acción</th>
+				</tr>
+			</table>
+		</div>
+		<br><br><br><br><br>
+		<table border=1 bgcolor=white cellspacing=0 style='border-color:#E3E3E3;' width='100%' id='tb_list_base'></table>
+		<script src="js/jquery-1.9.1.js"></script>
+		<script>
+			$(document).ready(function() {
+				view_attention();
+			});
+
+			function view_attention(action){
+				// alert(action);
+				// if( action == 'search' && $("#word").val().length < 3 ){
+				// 	if( $("#word").val().length !=0 )
+				// 		return;
+				// }
+				dh = "";
+				$.post('/get_allAttention_req', {action: action, word: $("#word").val() }, function(dt, textStatus, xhr) {
+					console.log(dt);
+					/*optional stuff to do after success */
+					
+						
+					for( i in dt ){
+						dh+="<tr title='Telefono: "+dt[i].telefono+", Lugar: "+dt[i].lugar+"'>"
+							+"<td width='5%'>"+(parseInt(i)+1)+"</td>"
+							+"<td width='16%'>"+dt[i].dni+"</td>"
+							+"<td width='30%'>"+dt[i].nombres+"</td>"
+							// +"<td width='10%'>"+dt[i].edad+"</td>"
+							+"<td width='20%'>"+dt[i].motivo_name+"</td>"
+							+"<td width='15%'>"+dt[i].hora+", "+dt[i].fecha+"</td>"
+							+"<td><a href='register_attention?rdr=attention&ureg&dni="+dt[i].dni+"&id_attention="+dt[i].id_attention+"'>Ver</a></td>"
+						+"</tr>";
+					}
+					$("#tb_list_base").html(dh);
+					$("#word").select();
+				});
+			}
+			
+			
+		</script>
+	`; 
+
+	
+	return dhg;
+}
+
+%>

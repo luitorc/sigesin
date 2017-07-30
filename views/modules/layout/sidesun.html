@@ -1,0 +1,1556 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link href="css/default.css" rel="stylesheet" type="text/css">
+  <script type="text/javascript" src="js/jquery-1.9.1.js">
+    
+  </script><script type="text/javascript" src="js/luitorc.js"></script>
+  <script type="text/javascript" src="js/bootstrap.js"></script>
+  <script type="text/javascript" src="js/tether.min.js"></script>
+  
+
+  <style>
+    .menu_option{
+      color:#2856CB;
+      font-weight: bold;
+      font-size:16px;
+      cursor:pointer;
+    }
+  </style>
+</head>
+
+<body >
+  <link rel="stylesheet" href="lib/tablesorter/themes/blue/style.css">
+  <script type="text/javascript" src="lib/tablesorter/jquery-latest.js"></script>
+  <script type="text/javascript" src="lib/tablesorter/jquery.tablesorter.js"></script>
+  <script type="text/javascript" src="lib/luitor/luitor_all.js"></script>
+  <script type="text/javascript" src="lib/tabla_html_to_csv/jquery.toCSV.min.js"></script>
+  <script src="lib/FileSaver.js-master/FileSaver.js"></script>
+  <!-- <script type="text/javascript" src="lib/luitor/float_window.js"></script> -->
+  <!-- <script src="js/sortTable.js"></script> -->
+  <style>
+    /* #tb_base_sort table tr:hover{
+                        background-color: yellow;
+                      }
+                      #tb_base_search table td{
+                        padding: 3px 4px;
+                        font-size: 14px;
+                      }
+                      #tb_base_search table th{
+                        padding: 3px;
+                        font-size: 14px;
+                      }*/
+    
+    body {
+      /*background-color: yellow;*/
+    }
+    
+    .pointer {
+      cursor: pointer;
+    }
+  </style>
+
+
+
+  <nav class="navbar navbar-full navbar-light bg-faded">
+    <span class="col-md-3">
+                <i class="fa fa-arrows-alt fa-2x fa-fw pull-left" onclick="window.open('/sidesun');" style="cursor:pointer;color:#BFBFBF;" title="maximizar"></i>
+                <span class="navbar-brand text-muted" onclick="window.location.href='/sidesun'" style="cursor:pointer;">
+                    <b>&nbsp;&nbsp;&nbsp;SIDESUN</b>
+                </span>
+                    
+    </span>
+    <span class="col-md-5">
+                <input type="text" class="form-control col-md-8" placeholder="nombre, dni, institución " id="word" onkeyup="if( event.keyCode== 13 ) search(); ">
+                <button class="form-control col-md-3" onclick="search();">Buscar</button>
+            </span>
+    <span class="col-md-4">
+                <ul class="nav navbar-nav pull-right" style='display: none;'>
+                    <li class="active nav-item active">
+                        <a class="nav-link" href="#">Notas generales</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"></a>
+                    </li>
+                </ul>
+            </span>
+  </nav>
+  <style>
+    .view {
+      color: blue;
+      cursor: pointer;
+    }
+  </style>
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <hr class="">
+          <div class="table-responsive" id="tb_base_search"></div>
+        </div>
+      </div>
+      <div class="row" id='ies_base'>
+        <div class="col-md-12">
+          <ul class="list-group" id="ies_list">
+            <li class="list-group-item p-y-2" style="font-size:20px;"> &nbsp;&nbsp;Universidad Nacional de Moquegua<img src="http://v4.pingendo.com/assets/photos/apple/photo-1.jpg" class="img-circle pull-left" style="width:50px"></li>
+            <li class="list-group-item p-y-2"> &nbsp;&nbsp;Unitek
+              <img src="http://v4.pingendo.com/assets/photos/apple/photo-1.jpg" class="img-circle pull-left" style="width:50px"></li>
+
+
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fade modal" id="myModal" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+          <!-- <h4 class="modal-title" id="myModalLabel">Boleta de nota Oficial</h4> -->
+            <span style="color:blue;cursor:pointer;" onclick="$('#myModal').modal('toggle');">Volver</span>
+          </div>
+
+        <div class="modal-body" id="base_doc">
+          
+          
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span id="btn_modal" data-toggle="modal" data-target="#myModal"></span>
+  <script>
+    var urlp = {};
+              if(location.search){
+                var parts = location.search.substring(1).split("&");
+            
+                for(var i=0;i<parts.length;i++){
+                  var nv = parts[i].split("=");
+                  if(!nv[0]) continue;
+                  urlp[nv[0]] = nv[1] || true;
+                }
+              }
+  </script>
+  <script>
+    var checked_click = 0;
+              var objAux = {};
+              var inst_arr = [];
+              $(document).ready(function() {
+                $("#word").focus();
+                $.post('/getAllInstitutionName'
+                  ,{param1: 'value1'}
+                  ,function(dt, textStatus, xhr) {
+                  /*optional stuff to do after success */
+                  var dh = "";
+                  for( i in dt ){
+                    
+                    var inst_obj = {};
+                    inst_obj.name_ins = dt[i].name_ins;
+                    inst_obj.sede = dt[i].sede;
+
+                    inst_arr[dt[i].id_institucion] = inst_obj;
+                    dh+="<li class='list-group-item p-y-2' style='font-size:20px;' onclick='ocultar_li(this)'> &nbsp;&nbsp;<span style='font-weight:bold;color:#474747;cursor:pointer;'>"+dt[i].name_ins+"</span><span style='font-size:14px;color:#919191;'> "+dt[i].sede+"</span><img src='logo/"+dt[i].logo+"' class='pull-left' style='width:50px;cursor:pointer;'>"
+                    +"<img src='ico/serach_regis.png' class='pull-right' style='width:40px;cursor:pointer;' onclick=\"setSedeIes('"+dt[i].name_ins+"','"+dt[i].sede+"');$('body').scrollTop(0);\" >"
+
+                      +"<div class='context' id='list_"+dt[i].id_institucion+"' style='display:none;background-color:;width:100%;'><br>"
+                        +"<ul class='career_list'></ul>"
+                      +"</div>"
+                    +"</li>";
+                  }
+                  $("#ies_list").html(dh);
+                  //Hover
+                  $( "#ies_list .list-group-item" ).hover(
+                      function() {
+                        $( this ).addClass('active').find("span").css({'color':'white'});
+                      }, function() {
+                        $( this ).removeClass( "active" ).find("span").css({'color':'474747'});
+                      }
+                    );              
+                  getAllCareer();
+                  });
+              });
+              function getAllCareer(){
+                $.post('/getAllCareer', {param1: 'value1'}
+                  ,function(dt, textStatus, xhr) {
+                  /*optional stuff to do after success */
+                  for( i in dt ){
+                    
+                    $("#list_"+dt[i].id_institucion+" .career_list").append(
+                      "<li onclick=\"setSedeIes('"+inst_arr[dt[i].id_institucion].name_ins+"','"+inst_arr[dt[i].id_institucion].sede+"','"+dt[i].name_car+"');\" style=' text-decoration: underline;cursor:pointer;'>"+dt[i].name_car+"</li>"
+                      );
+                    // 
+                  }
+                });
+              }
+              var ciclo = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV"];
+              var cant_ciclo;
+              var becario_select = 0;
+              var active_only = false;
+              var search_aux = {};
+              function ocultar_li(thisx){
+                if( $(thisx).find(".context").is(":visible") )
+                  $(thisx).find(".context").fadeOut();
+                else
+                  $(thisx).find(".context").fadeIn();
+              }
+              function setSedeIes(iesName,sede, name_car){
+                // search_aux.data = data;
+                // search_aux.action = action;
+                search({"name_ins": iesName,"sede": sede, "name_car": name_car},"select_institution_x_sede");
+
+              }
+              function search(data, action){
+                console.log(data);
+                $("#ies_base").hide();
+                // alert(action);
+                // try{
+                //   if( data.state ){
+                //     $("#active_only").prop('checked',false);
+                //   }
+            
+                // }catch(ex){
+                  // if(action == undefined){
+                  //   active_only = false;
+                  // }
+            
+                // }
+                // if( data.state != 'E' && data.state != 'AE' && data.state != 'O' ){
+                //   alert("entro");
+                  // alert(checked_click);
+                  if( checked_click == 2 ){
+                    active_only = true;
+                    checked_click = 0;
+                  }else if(checked_click == 1){
+                    active_only = false;
+                    checked_click = 0;
+                  }else if(checked_click == 0){
+                    // checked_click = 0;
+                    if(action==undefined){
+                      active_only = false;
+                    }
+                  }
+                  search_aux.data = data;
+                  search_aux.action = action;
+                // }
+                // if( checked_click ){
+                //   active_only = false;
+                // }else{
+                //   active_only = false;
+                // }
+                var dh;
+                // alert(data +" : "+action);
+                if(action == undefined){
+                  action = "search_becario";
+                }else{
+                  becario_select = data.becario_select;
+                  // alert(becario_select);
+            
+                }
+
+                /*search specials*/
+                if( action == "select_institution_x_sede" ){
+                  if( data.name_car ){
+                    setTimeout(function(){
+                      $("#searchName").html( data.name_ins+" "+data.sede+" - "+data.name_car );
+
+                    },500);
+                  }
+                }
+                // FIN+++++++++++++++
+
+                var d1 = new Date(); //"now"
+                var d2;
+                $("#execution_time").html( "()" );
+            
+                
+                $.post('/sidesun_search', {
+                  word: $("#word").val()
+                  ,action: action
+                  ,data: data
+                  // ,active_only: $("#active_only").is(":checked")
+                  // ,active_only: $("#active_only").is(":checked")?"true":"false"
+                  ,active_only: active_only?"true":"false"
+                },function(dt, textStatus, xhr) {
+                  console.log(data);
+                  console.log("datos receipt server");
+                  console.log(action+" >> ");
+                  console.log(dt);
+                  d2 = new Date()  // some date
+                  // var diff = Math.abs(d1-d2);  // difference in milliseconds
+                  var diff = Math.abs(d1-d2)/1000;  // difference in secun
+            
+                  /*optional stuff to do after success */
+                  // alert("entro");
+                  objAux = dt;
+            
+                  $("#tb_base_search").html( "<div id='tb_base_sort'>"+create_structure(dt,action)+"</div>" );
+            
+            
+                  $("#execution_time").html( "( Encontrados en "+diff+" seconds) " );
+                  $("#word").select();
+            
+                  // alert("entro");
+                  $("#id_bec_"+becario_select).focus();
+            
+                  $("#id_bec_"+becario_select).css({"background-color":"#67FF99"});
+                  $("#active_only").change(function(event) {
+                    /* Act on the event */
+                    if( $(this).is(":checked") ){
+                      active_only = true;
+                      checked_click = 2;
+                    }
+                    else{
+                      active_only = false;
+                      checked_click = 1;
+                    }
+                    // if(search_aux.action == undefined){
+                    //   search_aux.action = "search_becario";
+                    // }
+                    // alert(active_only);
+                    search(search_aux.data,search_aux.action);
+                  //select becario
+                    // $(window).scrollTop(-300);
+            
+                    // if(action == undefined){
+                    //   document.getElementById('active_only').checked = false;
+                    // }
+
+                    //Ocultamos las Ies al iniciar
+                    
+                  });
+            
+                  // if(action == undefined){
+                    //   document.getElementById('active_only').checked = false;
+                    // }
+                  // alert(active_only);
+                  // alert(becario_select);
+                });
+            
+              }
+              // function tablerOrder1(){
+              //   // alert("hola");
+              //   // $("#tb_select_ciclos").sortTable("number", {column: 20, reverse: true});
+              //   $("#tb_select_ciclos").sortTable("number", {column: 20, reverse: false});
+              //   // alert(cant_ciclo);
+              // }
+              function bouble_click_modal(dt){
+                var is_http = dt.boleta.slice(0,4);
+                  if( is_http == "http" ){  
+                    $("#base_doc").html("<iframe src='"+dt.boleta+"&zoom=80&view=FitH' width='100%' height='600' id='obj_ifra'></iframe>");
+                  }else{
+                    $("#base_doc").html("<iframe src='./doc/boleta/"+dt.boleta+"#page="+dt.pag+"&zoom=80&view=FitH' width='100%' height='600' id='obj_ifra'></iframe>");
+                  }
+                
+                // $("#obj_ifra").attr('src',"./doc/boleta/"+dt.boleta+"#page="+dt.pag+"&zoom=80&view=FitH");
+                $('#btn_modal').click();
+                // alert("entro");
+                // $('#btn_modal').click();
+              }
+            
+              function regis_curso(id_promedio){
+                var sub_pro = $("#sub_promedio_"+id_promedio);
+            
+                var objdt = {
+                  curso : sub_pro.find("#curso").val()
+                  ,credito : sub_pro.find("#credito").val()
+                  ,nota : sub_pro.find("#nota").val()
+                  ,ciclo : sub_pro.find("#ciclo").val()
+                  ,id_becario : sub_pro.find("#id_becario").val()
+                  ,id_promedio : sub_pro.find("#id_promedio").val()
+                }
+                
+                  
+                // try{
+            
+                // }catch(ex){
+                //   var dh=" <span style='background-color:red;border-radius:20px;padding:2px;color:white;display:none;' id='tbcantn_"+id_promedio+"' class='tbcantn'>1</span></span>";
+                //   $("#tbcantn_"+id_promedio).html(dh);
+                // }
+                
+                $.post('/saveCursoXaverage', objdt, function(dt, textStatus, xhr) {
+                  /*optional stuff to do after success */
+                  //clear textboxs
+                  $("#sub_promedio_"+dt.id_promedio+" input,textarea").val("");
+                  // alert("entro345");
+                    if( dt.success == 1 ){
+                      // #tbnota_993
+                      if( $("#tbnota_"+dt.id_promedio).length > 0 ){
+                        $("#th_nota_"+dt.id_promedio).show().css({'width':'200px','font-size':'11px'});
+                        // alert("existe");
+                        $("#tbnota_"+dt.id_promedio).append(
+                          "<tr>"
+                            +"<td>"+dt.ciclo+"</td>"
+                            +"<td>"+dt.curso+"</td>"
+                            +"<td>"+dt.credito+"</td>"
+                            +"<td>"+dt.nota+"</td>"
+                          +"</tr>"
+                        );
+                        //tbcantn_993
+                        $("#tbcantn_"+dt.id_promedio).show();
+                        if( $("#tbcantn_"+dt.id_promedio) ){
+                          // alert("existe");
+                          $("#tbcantn_"+dt.id_promedio).html( parseInt($("#tbcantn_"+dt.id_promedio).text() ) +1 );
+                        }else{
+                          // alert("No existe");
+                          var dh=" <span style='background-color:red;border-radius:20px;padding:2px;color:white;display:none;' id='tbcantn_"+dt.id_promedio+"' class='tbcantn'>1</span></span>";
+                          $("#tbcantn_"+dt.id_promedio).html(dh);
+                        }
+                        // console.log("rsta:");
+                        // console.log(dt);
+            
+            
+                      }else{
+                        alert("no existe");
+                         search(search_aux.data,search_aux.action);
+                      }
+                      
+                      
+                    }else{
+                      alert("Error al guardar");
+                    }
+                  
+                });
+              }
+              // var curso_box = -1;
+              function textbox_curso(id_promedio,form){
+                  
+                if( form == 'delete' ){
+                  var txt;
+                  var r = confirm("¿Esta seguro que quiere eliminar la nota seleccionada?");
+                  if (r == true) {
+                      //Eliminar
+                      $.post('/sindibe_deletepromedio', {
+                        id_promedio: id_promedio
+                      }, function(dt, textStatus, xhr) {
+                        var confirm = parseInt(dt.rowCount);
+                        // console.log(confirm);
+                        if(confirm > 0){
+                          $("#sub_promedio_underline_"+id_promedio).html("");
+                          //ocultamos panel floating
+                          $('.lt_msn_dialog').hide();curso_box = -1;$('.css_sub_promedio').hide();
+                          $("#sub_promedio_underline_"+id_promedio).parent().parent().html("").addClass('viewselect');
+                          // console.log("entro");
+                        }
+                        // $("#nota_"+obj1.id_becario+"_"+obj1.ciclo).html(dt.promedio);
+                      });
+                     return; 
+                  } else {
+                      return;
+                      txt = "You pressed Cancel!";
+                  }
+                  console.log(txt);
+                }
+
+                $(".form_notasdesaprobada").hide();
+                $(".form_update_nota").hide();
+                $(".form_update_escaner").hide();
+                $("#sub_promedio_"+id_promedio).find('.'+form).show();
+                // curso_box = curso_box * -1;
+                // if( curso_box == 1 ){
+                $("#sub_promedio_"+id_promedio).show();
+                if( form != "form_notasdesaprobada" ){
+                  if( form != "form_viewCursoDesaprobado" ){
+                      $(".th_nota").hide();
+                      $(".form_update_nota #promedio").select();
+                  }else{ 
+
+                      $(".th_nota").show();
+                  }
+                    
+                }else{
+                  $(".form_notasdesaprobada #curso").focus();
+                    // $(".th_nota").show();
+                }
+                
+            
+                // }else{
+                  // $("#sub_promedio_"+id_promedio).hide();
+                  
+                // }
+              }
+              function update_promedio(id_promedio){
+                  var sub_pro = $("#sub_promedio_"+id_promedio);
+                  var obj = {
+                    id_promedio: id_promedio
+                    ,promedio: sub_pro.find("#promedio").val()
+                  };
+                  // console.log(obj.promedio);  
+                  $.post('/update_promedio', obj, function(dt, textStatus, xhr) {
+                    // console.log(id_promedio);
+                    // console.log(dt);
+                    $("#sub_promedio_underline_"+id_promedio).html(obj.promedio).css({"background-color":"yellow"});
+                    $('.lt_msn_dialog').hide();curso_box = -1;$('.css_sub_promedio').hide();
+                    /*optional stuff to do after success */
+                  });
+                }
+              function update_pag(boleta, id_promedio){
+                alert(boleta);
+                var sub_pro = $("#sub_promedio_"+id_promedio);
+                // alert(sub_pro.find("#pag").val() );
+                $.post('/setpagXbecario', {
+                  pag: sub_pro.find("#pag").val() 
+                  ,id_promedio: id_promedio 
+                }, function(dt, textStatus, xhr) {
+                  // console.log(dt);
+                  if( dt.pag != 0 ){
+                    $("#sub_promedio_underline_"+dt.id_promedio).css({'text-decoration':'underline'});
+                    $("#dblclick_subpro_"+dt.id_promedio).attr("ondblclick","bouble_click_modal({boleta: '"+boleta+"',pag:"+dt.pag+"});");
+                  }else{
+                    $("#sub_promedio_underline_"+dt.id_promedio).css({'text-decoration':''});
+                  }
+                });
+              }
+              function update_boleta(id_promedio){
+                var sub_pro = $("#sub_promedio_"+id_promedio);
+                // alert(sub_pro.find("#pag").val() );
+                $.post('/setboletaXbecario', {
+                  boleta: sub_pro.find("#boleta").val() 
+                  ,id_promedio: id_promedio 
+                }, function(dt, textStatus, xhr) {
+                  // console.log(dt);
+            
+                  //http
+                  var is_http = dt.boleta.slice(0,4);
+                  if( is_http == "http" ){
+                    if( dt.boleta != 0 ){
+                      $("#sub_promedio_underline_"+dt.id_promedio).css({'text-decoration':'underline'});
+                      // alert(dt.id_promedio);
+                      $("#dblclick_subpro_"+dt.id_promedio)
+                      .attr("style","background-color:yellow");
+                      // .attr("ondblclick","bouble_click_modal({boleta: '"+dt.boleta+"',pag:null})");
+                      // document.getElementById("dblclick_subpro_"+dt.id_promedio).attribute("ondblclick","alert('jiji')");
+                      // alert("entro123");
+                    }else{
+                      $("#sub_promedio_underline_"+dt.id_promedio).css({'text-decoration':''});
+                    }
+                  }else{
+                      $("#dblclick_subpro_"+dt.id_promedio).attr("ondblclick","bouble_click_modal({boleta: '"+dt.boleta+"',pag:null});");
+                  }
+                  // alert("termino");
+                  // alert( dt.boleta.slice(0,4) );
+                  // if( dt.boleta != 0 ){
+                  //   $("#sub_promedio_underline_"+dt.id_promedio).css({'text-decoration':'underline'});
+                  // }else{
+                  //   $("#sub_promedio_underline_"+dt.id_promedio).css({'text-decoration':''});
+                  // }
+                });
+              }
+              function insertPromedio(){
+                var content = $(".floatwin1");
+                 var obj1 = {
+                   anio_semestral: content.find("#anio_semestral").val()
+                   ,ciclo: content.find("#ciclo").val()
+                   ,id_becario: content.find("#id_becario").val()
+                   ,id_carrera: content.find("#id_carrera").val()
+                   ,id_institucion: content.find("#id_institucion").val()
+                   ,promedio: content.find("#promedio").val()
+                }
+                $.post('/insertPromedio', obj1, function(dt, textStatus, xhr) {
+                  /*optional stuff to do after success */
+                  if( dt.success ){
+                    toast("Guardado con exito", 3);
+                    $("#nota_"+obj1.id_becario+"_"+obj1.ciclo).html(dt.promedio);
+                    search_aux.data.becario_select = obj1.id_becario;
+                    // search(search_aux.data,search_aux.action);
+                  }else{
+                    toast("Error al guardar", 3);
+            
+                  }
+                });
+              }
+              function lt_floatwindow_click(this1){
+                  // alert("entro");
+                  var content = $(".floatwin1");
+                  var obj1 = {
+                     anio_semestral: $(this1).attr("anio_semestral")
+                     ,ciclo: $(this1).attr("ciclo")
+                     ,id_becario: $(this1).attr("bec")
+                     ,id_carrera: $(this1).attr("id_carrera")
+                     ,id_institucion: $(this1).attr("id_institucion")
+                     ,promedio: $(this1).attr("promedio")
+                  }
+                  
+                  content.find("#anio_semestral").val( obj1.anio_semestral );
+                  content.find("#ciclo").val( obj1.ciclo );
+                  content.find("#id_becario").val( obj1.id_becario );
+                  content.find("#id_carrera").val( obj1.id_carrera );
+                  content.find("#id_institucion").val( obj1.id_institucion );
+                  content.find("#promedio").val( "" ).focus();
+              }
+              var new_row = -1;
+              var row_end;
+              function addRow(){
+                row_end++;
+                $( "#tb_select_ciclos td:nth-child("+row_end+")" ).show();
+                $( "#tb_select_ciclos th:nth-child("+row_end+")" ).show();
+                
+              }
+              var ciclo_max;
+              function create_structure(dt,action){
+                var becario = [{
+                  color_simb: "E"
+                  ,bg_color: "#FF9E9E"
+                },{
+                  color_simb: "O"
+                  ,bg_color: "#FFF5AD"
+                },{
+                  color_simb: "AE"
+                  ,bg_color: "#BBF5FD"
+                }];
+                var dh = "";
+                ciclo_max = [];
+                  switch(action){
+                    case 'select_ciclos':
+                      // new_row++;
+                    // alert(cant_ciclo);
+                    // alert(dt[i].id_becario);
+                      dh+= cadena_section(dt,0,5);
+                      dh +="<div>"
+                      +"<span onclick=\"search({anio_convocatory:'"+dt[0].anio_convocatory+"',name_ins:'"+dt[0].name_ins+"',becario_select:'"+becario_select+"'}, 'select_convocaroty');\" class='menu_option'>CONV."+dt[0].anio_convocatory+"</span>"
+                      +" > "
+                      +"<span onclick=\"search({anio_convocatory:'"+dt[0].anio_convocatory+"',name_ins:'"+dt[0].name_ins+"',becario_select:'"+becario_select+"'}, 'select_institution');\" class='menu_option'>"+dt[0].name_ins+"</span>"
+                      +" > "
+                      +"<span onclick=\"search({anio_convocatory:'"+dt[0].anio_convocatory+"',name_ins:'"+dt[0].name_ins+"',sede: '"+dt[0].sede+"',becario_select:'"+becario_select+"'}, 'select_institution_x_sede');\" class='menu_option'>SEDE."+dt[0].sede+"</span>"
+                      +" > "
+                      +"<span onclick=\"search({anio_convocatory:'"+dt[0].anio_convocatory+"',name_ins:'"+dt[0].name_ins+"',sede: '"+dt[0].sede+"',name_car: '"+dt[0].name_car+"',becario_select:'"+becario_select+"'}, 'select_carrera');\" class='menu_option'>"+dt[0].name_car+"</span>"
+                      +" > "
+                      +"<span>"+dt[0].modalidad+"</span>"
+
+                      dh+="&nbsp;&nbsp;&nbsp;<button onclick='exportar()' download='your-foo.csv' style='color:#EEEEEE;background-color:#549D34;'><b>Exportar</b></button>";
+                      // dh+=" &nbsp;&nbsp;<button onclick='search(search_aux.data,search_aux.action);'>actualizar</button>"
+                      dh+="</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button onclick='search(search_aux.data,search_aux.action);'><img src='ico/update.png' style='width:25px' title='Actualizar'></button>";
+
+                      +"</div>";
+                      dh+= "<table border='1' width='100%' id='tb_select_ciclos' class='tablesorter'>"
+                        +"<thead>"
+                          +"<tr>"
+                            +"<th>N°</th>"
+                            +"<th>APELLIDOS Y NOMBRES</th>";
+                            // for( var h=0; h<cant_ciclo; h++){
+                            for( var h=0; h<(24); h++){
+                              if( ciclo[h] == undefined )
+                                ciclo[h] = "Nuevo "+(h+1);
+                              dh+="<th id='ciclo_"+(h+1)+"'>"+ciclo[h]+"</th>";
+            
+                            }
+                            dh+="<th onclick=\"tablerOrder1()\">PROMEDIO</th>"
+                                // +"<th>Boleta</th>"
+                                +"<th>state</th>"
+                          +"</tr>"
+                        +"</thead>";
+                      var name_ins = dt[0].name_ins;
+                      var name_car = dt[0].name_car;
+                      var anio_convocatory = dt[0].anio_convocatory;
+                      var sede = dt[0].sede;
+                      // alert(name_car);
+                      var regis_list = [];
+            
+                      ciclo_max = [];
+                      for( i in dt ){
+                        var bg_color = "white";
+                        for( var h=0; h<becario.length; h++ ){
+                          if(dt[i].state == becario[h].color_simb){
+                            bg_color = becario[h].bg_color;
+            
+                          }
+                        }
+                        var linkExp = "";
+                        if( dt[i].exp != null && dt[i].exp!= "" ){
+                          linkExp = "<a href='https://intranet.pronabec.gob.pe/Becario/Expediente/"+dt[i].exp+"' target='_blank' style='color:red;'><i class='fa fa-fw fa-lg fa-search text-primary' ></i></a> ";
+                        }
+            
+                        dh+="<tr id='id_bec_"+dt[i].id_becario+"' tabindex='1'>"
+                          +"<td>"+(parseInt(i)+1)+"</td>"
+                          +"<td title='id: "+dt[i].id_becario+", carrera: "+dt[i].name_car+"'> "+linkExp+"<span class='sub_promedio'>"+dt[i].nombresc+"</td>";
+                          var regis = {};
+                          var campos = [];
+                          // for( var h=0; h<cant_ciclo; h++){
+                          
+                          for( var h=0; h<(24); h++){
+                              campos.push("nota_"+dt[i].id_becario+"_"+(h+1));
+                              var anio_semestral = ""; 
+                              if( name_car == "INGLES" )
+                                anio_semestral = "Mod."+(h+1);
+                              else
+                                anio_semestral = "";
+                              dh+="<td id='nota_"+dt[i].id_becario+"_"+(h+1)+"' bec='"+dt[i].id_becario+"' ciclo='"+(h+1)+"' anio_semestral='"+anio_semestral+"' id_carrera='"+dt[i].id_carrera+"' id_institucion='"+dt[i].id_institucion+"' class='viewselect'></td>";
+                            }
+                          regis.nota = campos;
+                          regis.id_becario = dt[i].id_becario;
+                          dh+="<td id='pro_"+dt[i].id_becario+"'></td>"
+                          // +"<td id='boleta_"+dt[i].id_becario+"'>"
+                          //   +"<span class='view' data-toggle='modal' href='#myModal'>ver</span>"
+                          // +"</td>"
+                          +"<td style='background-color:"+bg_color+";'></td>"
+                          ;
+                          // +"<td style='background-color:"+bg_color+";'>1</td>"
+                          dh+="</tr>";
+                          regis_list.push(regis);
+            
+                         
+                          
+                      }
+                       
+                       // alert("entro");
+                      var nota_min;
+                      $.post('/sidesun_search', {
+            
+                        action: "notas_x_ciclo"
+                        ,data: {
+                          name_ins: name_ins
+                          ,name_car: name_car
+                          ,anio_convocatory: anio_convocatory 
+                          ,sede: sede
+                        }
+                      },function(dt, textStatus, xhr) {
+
+                        /*optional stuff to do after success */
+                        for(i in dt){
+                        var dtpromedio = "";
+            
+            
+                          if( dt[i].name_ins == "ICPNA" ){
+                            nota_min = 79;
+                          }else{
+                            nota_min = 10;
+                          }
+            
+                          if( dt[i].promedio == null )
+                            dt[i].promedio = "";
+            
+                          ciclo_max.push(parseInt(dt[i].ciclo) );
+            
+                          var lt_showdialog = ""
+
+                          +"<div style='position:absolute;box-shadow:1px 1px 7px #E8E8E8;padding:10px;background-color:rgba(157, 155, 151, 0.4);margin-left:9px;margin-top:6px;width:200px' id='panel_2'>"
+                            //Options - MENU
+                            +"<span style='color:red;cursor:pointer;position:absolute;padding:3px;font-weight:bold;margin-top:-9px;margin-left:175px;font-size:14px;' onclick=\"setTimeout(function(){$('.lt_msn_dialog').hide();curso_box = -1;$('.css_sub_promedio').hide();},10);\">x</span>"
+                            +""
+                            +"<span style='color:white;cursor:pointer;background-color:#E15907;margin-top:-12px;padding:3px;' onclick=\"textbox_curso("+dt[i].id_promedio+",'form_update_nota');\">Editar</span>"
+                            +"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                            +"<span style='color:white;cursor:pointer;background-color:#DD0000;margin-top:-12px;padding:3px;' onclick=\"textbox_curso("+dt[i].id_promedio+",'delete');\">Eliminar</span>"
+                            +"<br><br>"
+
+                            +"<span style='color:white;cursor:pointer;background-color:#3C8ABB;margin-top:-12px;padding:3px;' onclick=\"textbox_curso("+dt[i].id_promedio+",'form_update_escaner');\">Añadir Documento de Notas</span>"
+                            +"<br><br>"
+
+                            +"<span style='color:white;cursor:pointer;background-color:#D80606;margin-top:-12px;padding:3px;' onclick=\"textbox_curso("+dt[i].id_promedio+",'form_notasdesaprobada');\">Añadir Curso Desaprobado</span>"
+                            +"<br><br>"
+                            +"<span style='color:white;cursor:pointer;background-color:#B640B7;margin-top:-12px;padding:3px;' onclick=\"textbox_curso("+dt[i].id_promedio+",'form_viewCursoDesaprobado');\">Ver Curso Desaprobado</span>"
+                            +"<br><br>"
+
+                            // FORMULARIO DE CURSO DESAPROBADO
+                          +"<div id='sub_promedio_"+dt[i].id_promedio+"' style='background-color:white;display:none;padding:3px;' class='css_sub_promedio'>"
+                            +"<div class='form_notasdesaprobada'>"
+                              +"<div align='center' style='color:black;font-weight:bold;'><u>Añadir Notas Desaprobadas</u></div><br>"
+                              +"<span style='display:none;'>ID:<input id='id_curso' style='width:60px;' disabled></span>"
+                              +"<br>Curso:<textarea id='curso' style='font-size:10px;' cols='20' rows='2'></textarea>"
+                              +"<br>Credito:<input id='credito' style='width:60px;'>"
+                              +"<br>Nota:<input id='nota' style='width:50px;'>"
+                              +"<br>Ciclo:<input id='ciclo' disabled style='width:40px;'>"
+                              +"<br><span style='display:none;'>id_becario:<input id='id_becario' style='width:60px;'></span>"
+                              +"<br><span style='display:none;'>id_promedio:<input id='id_promedio' style='width:60px;display:none;'></span>"
+                              +"<div align='center'><button onclick='regis_curso("+dt[i].id_promedio+");'>Añadir</button></div>"
+                              +"<br><br>"
+                            +"</div>"
+
+                          //FORMULARIO DE ACTUALIZACION DE NOTA
+                            +"<div class='form_update_nota'>"
+                              +"<div align='center' style='color:black;font-weight:bold;'><u>Actualización de Nota</u></div><br>"
+                               +"Promedio: <input type='text' style='width:60px;background-color:#E9F6F9;' id='promedio'>"
+                               +"<br><div align='center'><button onclick='update_promedio("+dt[i].id_promedio+")'>Actualizar</div>"
+                            +"</div>"
+                          //FORMULARIO DE ADD FICHA DE NOTAS ESCANER
+                            +"<div class='form_update_escaner'>"
+                              +"<div align='center' style='color:black;font-weight:bold;'><u>Añadir Ficha de Notas</u></div><br>"
+                              +"<div>Pagina: <input type='text' style='width:40px;' id='pag'> <button onclick='update_pag(\""+dt[i].boleta+"\","+dt[i].id_promedio+")'>Seleccionar</div>"
+                              +"<div>Documento: <input type='text' style='width:170px;' id='boleta'> <button onclick='update_boleta("+dt[i].id_promedio+")'>Actualizar Documento (URL).</div>"
+                            +"</div>"
+                          +"</div>"
+                          +"<table border=\"1\" id='th_nota_"+dt[i].id_promedio+"' class='th_nota' style='display:none;background-color:white;width:100%;'>"
+                            +"<tr>"
+                              +"<th colspan='4' align='center'>Cursos Desaprobados</th>"
+                            +"</tr>"
+                            +"<tr>"
+                              +"<th style='font-size:12px;'>Ciclo</th>"
+                              +"<th style='font-size:12px;'>Curso</th>"
+                              +"<th style='font-size:12px;'>Credito</th>"
+                              +"<th style='font-size:12px;'>Nota</th>"
+                            +"</tr>"
+                            +"<tbody  id=\"tbnota_"+dt[i].id_promedio+"\" class='tbnota'>"
+                            +"<tbody>"
+                          +"</table></div>";
+                          var underline="",style1="";
+                          try{
+                            var is_http = dt[i].boleta.slice(0,4);
+                            if( is_http == "http" )
+                              underline = "text-decoration:underline;cursor:pointer;";                
+                          }catch(ex){
+                          }
+            
+                          if( dt[i].pag != null && dt[i].pag != 0  )
+                            underline = "text-decoration:underline;cursor:pointer;";
+                          if( dt[i].promedio > nota_min ){
+            
+                            if( dt[i].promedio < 10 )
+                              dt[i].promedio ="0"+dt[i].promedio;
+                          }else{
+                            style1+="color:red;";
+                            if( dt[i].promedio != "" && dt[i].promedio != null ){
+            
+                              if( dt[i].promedio < 10 )
+                                dt[i].promedio ="0"+dt[i].promedio;
+            
+            
+                            }else{
+                              // dt[i].promedio = "<span style='color:red;'>0</span>";
+                              dt[i].promedio = "000";
+                            }
+                          }
+            
+            
+            
+                          if( dt[i].name_ins == "ICPNA" ){
+                            dt[i].promedio =("0" + parseInt(dt[i].promedio)  ).slice(-3);
+                          }else{
+                            // dt[i].promedio =("0" + parseFloat(dt[i].promedio)  ).slice(-2);
+                          }
+                           
+                            dtpromedio = "<span style='color:blue;'  ondblclick=\"bouble_click_modal({boleta: '"+dt[i].boleta+"',pag:"+dt[i].pag+"});\" class='lt_showdialog' id='dblclick_subpro_"+dt[i].id_promedio+"'>"
+                            +"<div class='lt_msn_dialog' id_becario='"+dt[i].id_becario+"' id_promedio='"+dt[i].id_promedio+"' ciclo='"+dt[i].ciclo+"'>"+
+                            lt_showdialog+"</div>";
+            
+                              dtpromedio+="<span class='sub_promedio' id='sub_promedio_underline_"+dt[i].id_promedio+"' title='id_p: "+dt[i].id_promedio+"' style='"+underline+""+style1+"'>"+dt[i].promedio+"</span>";
+            
+                              dtpromedio+=" <span style='background-color:red;border-radius:20px;padding:2px;color:white;display:none;' id='tbcantn_"+dt[i].id_promedio+"' class='tbcantn'>0</span></span>";
+            
+                          $("#nota_"+dt[i].id_becario+"_"+dt[i].ciclo).html( dtpromedio );
+                          // if( dt[i].promedio != 0 && dt[i].promedio != "" )
+                            $("#nota_"+dt[i].id_becario+"_"+dt[i].ciclo).removeClass('viewselect');
+                          
+                          var header_ciclo;
+                          if(search_aux.data.name_ins != "ICPNA"){
+                            header_ciclo = "<span>"+dt[i].anio_semestral+"<br>C."+dt[i].ciclo;
+                          }else{
+                            //para IPCNA
+                            header_ciclo = "M."+dt[i].ciclo+"<br><br><br>";
+                          }
+                          
+                          $("#ciclo_"+dt[i].ciclo).html( header_ciclo).css({"text-align":"center"});
+                        }
+                        ciclo_max = ciclo_max.sort(function( a, b ){ return b-a; });
+            
+                        //ocultamos
+                        $(".lt_msn_dialog").hide();
+                        //Añadimos un max a la casi ultima columna 
+                        var stringText = "<div style='position:absolute;right:140;margin-top:-50px;font-size:22px;color:blue;text-shadow:1px 3px 6px #888;' title='añadir nueva columna de notas' onclick=\"event.stopPropagation();addRow()\"><b>1+</b></div>";
+                        $("#ciclo_"+ciclo_max[0]).append( stringText );
+            
+                        var ini_ciclo = 2;
+                        for( var j=ciclo_max[0]+1; j<=24;j++ ){
+                          row_end = ciclo_max[0]+2;
+                          var col_td = ini_ciclo+ j;
+                          $( "#tb_select_ciclos td:nth-child("+col_td+")" ).hide();
+                          $( "#tb_select_ciclos th:nth-child("+col_td+")" ).hide();
+                        }
+                        get_promedio(regis_list);
+            
+                        $("#tb_select_ciclos").tablesorter();
+                       
+                        $(window).click(function() {
+                          
+                            /* Aqui se esconden los menus que esten visibles*/
+                            if( $(".lt_msn_dialog").is(":visible") ){
+                              $(".lt_msn_dialog").hide();
+            
+                              curso_box = -1;
+                              $(".css_sub_promedio").hide();
+            
+                            }
+                        });
+//************************************************************++
+                        $(".sub_promedio").click(function(){
+
+                          $(".th_nota").hide();
+                        });
+//************************************************************++
+
+                        $(".regis_new").hover(function() {
+                          // alert("hgola");
+                              $( this ).append( "<div style='font-size:14px;background-color:;text-align:center;color:blue;cursor:pointer;padding:5px;margin-top:-4px;position:absolute' class='regis_new_hover' onclick=\"event.stopPropagation();addRow();\" ><b>1+</b></div>" );
+                            }, function() {
+                              // $( this ).find( "div:last" ).remove();
+                              $( this ).find( ".regis_new_hover" ).remove();
+                          });
+                          // $("tr").removeClass();
+                          lt_floatwin({
+                            id: 'floatwin1'
+                            ,html: "<div align='center'><u>Nueva Nota</u></div><br>"
+                                  +"<div>Año semestral: <input type='text' id='anio_semestral'></div>"
+                                  +"<div style='display:none;'>Ciclo: <input type='text' id='ciclo'></div>"
+                                  +"<div>Promedio: <input type='text' id='promedio'></div>"
+                                  +"<div style='display:none;'>id_becario: <input type='text' id='id_becario'></div>"
+                                  +"<div style='display:none;'>id_carrera: <input type='text' id='id_carrera'></div>"
+                                  +"<div style='display:none;'>id_institucion: <input type='text' id='id_institucion'></div><br>"
+                                  +"<div align='center'><button onclick='insertPromedio();'>Registrar</button></div>"
+                            ,config:{
+                              // Al escribir attr style, se deshabilita la configuración basica de css
+                              width: 'auto'
+                              ,height: 'auto'
+                              ,color: "auto"
+                              ,bgcolor: "auto"
+                              ,colorclick: '#9DFF98'
+                              ,test: false
+                            }
+                          }); 
+                        // $(this).hasClass("lt_msn_dialog").text( $(this).attr('lt_showdialog') );
+                        // $(".lt_showdialog").append( $(".lt_showdialog").attr('lt_showdialog') );
+                        $(".lt_showdialog").click(function(e) {
+
+                          e.stopPropagation();
+                          // $(this).hasClass("lt_msn_dialog").text( $(this).attr('lt_showdialog') );
+                          // $(this).find(".lt_msn_dialog").html( $(this).attr('lt_showdialog') );
+                          $(".lt_msn_dialog").hide();
+                          // curso_box = -1;
+                          // $(".css_sub_promedio").hide();
+            
+                          // alert("entro");
+                          $(this).find(".lt_msn_dialog").show();
+                          var id_promedio = $(this).find(".lt_msn_dialog").attr("id_promedio");
+                          var id_becario = $(this).find(".lt_msn_dialog").attr("id_becario");
+                          var ciclo = $(this).find(".lt_msn_dialog").attr("ciclo");
+                          // alert(id_promedio);
+                          $("#sub_promedio_"+id_promedio + " #id_promedio").val(id_promedio);
+                          $("#sub_promedio_"+id_promedio + " #id_becario").val(id_becario);
+                          $("#sub_promedio_"+id_promedio + " #ciclo").val(ciclo);
+                          var subpromedio = $("#sub_promedio_underline_"+id_promedio).text();
+                          $("#sub_promedio_"+id_promedio + " #promedio").val(subpromedio);
+                          // $("lt_msn_dialog").text( "como estas" );
+
+                          // $("#sub_promedio_"+id_promedio + " #promedio").focus();
+                        });
+                        
+                          $.post('/getCantnotasXcurso', {
+                            ciclo: ciclo_max[0]
+                          },function(dt, textStatus, xhr) {
+                              for( i in dt ){
+                                
+                                  $("#tbcantn_"+dt[i].id_promedio).html(dt[i].cantidad);
+                                  $("#tbcantn_"+dt[i].id_promedio).show();
+                              }
+                              $.post('/getnotasXcurso', {
+                                ciclo: ciclo_max[0]
+                              },function(dt, textStatus, xhr) {
+                                $(".tbnota").html("");
+                                  for( i in dt ){
+                                  var dh="";
+                                    dh+="<tr style='font-size:12px;'>";
+                                      dh+="<td>"+dt[i].ciclo+"</td>";
+                                      dh+="<td>"+dt[i].nombrecu+"</td>";
+                                      dh+="<td>"+dt[i].credito+"</td>";
+                                      dh+="<td style='color:red;'>"+dt[i].nota+"</td>";
+                                    dh+="</tr>";
+                                      $("#tbnota_"+dt[i].id_promedio).append(dh);
+                                      // $("#th_nota_"+dt[i].id_promedio).show();
+                                  }
+                              });
+            
+                          });
+            
+                      });
+            
+                      
+                      function get_promedio(regis_list){
+                        // alert("entro");
+                        for( var x=0;x<regis_list.length;x++ ){
+                          var sum_nota = 0;
+                          // for(var y=0;y<regis_list[0].nota.length;y++){
+                          for(var y=0;y<ciclo_max[0];y++){
+                            sum_nota += parseFloat( $("#"+regis_list[x].nota[y]+" .sub_promedio").text() );
+                            // sum_nota += 2;
+                          }
+                          var pro = (sum_nota/ciclo_max[0]).toFixed(4);
+                          if( isNaN(pro) )
+                            pro = "";
+                          if( pro > nota_min ){
+                            // pro = "<span style='color:blue;' data-toggle='modal' data-target='#myModal'>"+pro+"</span>";
+                            pro = "<span style='color:blue;' class='sub_promedio'>"+pro+"</span>";
+                          }else{
+                            pro = "<span style='color:red;' class='sub_promedio'>"+pro+"</span>";
+                          }
+                          // alert();
+                          $("#pro_"+regis_list[x].id_becario).html(pro);
+            
+                        }
+                      } 
+                      // alert("jaja");
+                      
+                      break;
+            
+                    case 'select_carrera':
+                      dh = cadena_section(dt,0,4);
+                      // alert("entro");
+                      
+                      dh +="<span onclick=\"search({anio_convocatory:'"+dt[0].anio_convocatory+"',name_ins:'"+dt[0].name_ins+"',becario_select:'"+becario_select+"'}, 'select_convocaroty');\" class='menu_option'>CONV."+dt[0].anio_convocatory+"</span>"
+                      +" > "
+                      +"<span onclick=\"search({anio_convocatory:'"+dt[0].anio_convocatory+"',name_ins:'"+dt[0].name_ins+"',becario_select:'"+becario_select+"'}, 'select_institution');\" class='menu_option'>"+dt[0].name_ins+"</span>"
+                      +" > "
+                      +"<span>"+dt[0].name_car+"</span>"
+                      +"<table border='1' width='100%' class='tablesorter'>"
+                        +"<thead>"
+                          +"<tr>"
+                            +"<th>N°</th>"
+                            +"<th onclick=\"ordenar('nombresc',-1,'"+action+"');\">APELLIDOS Y NOMBRES</th>"
+                            +"<th>Modalidad</th>"
+                            +"<th>CICLOS</th>"
+                            +"<th onclick=\"ordenar('pro_global',-1,'"+action+"');\">PROMEDIO</th>"
+                            +"<th>state</th>"
+                          +"</tr>"
+                        +"</thead>";
+                      for( i in dt ){
+                        var bg_color = "white";
+                        for( var h=0; h<becario.length; h++ ){
+                          if(dt[i].state == becario[h].color_simb){
+                            bg_color = becario[h].bg_color;
+                          }
+                        }
+            
+                        dh+="<tr id='id_bec_"+dt[i].id_becario+"' tabindex='1'>"
+                          +"<td>"+(parseInt(i)+1)+"</td>"
+                          +"<td>"+dt[i].nombresc+"</td>"
+                          +"<td>"+dt[i].modalidad+"</td>"
+                          +"<td><span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[i].anio_convocatory+"',name_ins:'"+dt[i].name_ins+"',sede: '"+dt[i].sede+"',name_car: '"+dt[i].name_car+"',modalidad:'"+dt[i].modalidad+"',becario_select:'"+dt[i].id_becario+"'}, 'select_ciclos');cant_ciclo="+dt[i].cant_ciclo+";\">I...";
+                          if( dt[i].name_ins == 'ICPNA' ){
+                            dh+=dt[i].cant_ciclo;
+                          }
+                          else{
+                            var cicloLast= ciclo[parseInt(dt[i].cant_ciclo)-1]; 
+                            dh+=cicloLast==undefined?'S/N':cicloLast;
+                          }
+            
+                          dh+="</span></td>"
+                          +"<td>"+dt[i].pro_global+"</td>"
+                          +"<td style='background-color:"+bg_color+";'></td>"
+                        +"</tr>";
+                      }
+                      break;
+
+                    case 'select_institution_x_sede':
+                      dh = cadena_section(dt,1,3);
+
+                      dh +="<span onclick=\"search({anio_convocatory:'"+dt[0].anio_convocatory+"',name_ins:'"+dt[0].name_ins+"',becario_select:'"+becario_select+"'}, 'select_institution');\" class='menu_option'>"+dt[0].name_ins+"</span>"
+                      +" > "+dt[0].sede
+                      dh += "<table border='1' width='100%' class='tablesorter'>"
+                        +"<thead>"
+                          +"<tr>"
+                            +"<th>N°</th>"
+                            +"<th onclick=\"ordenar('nombresc',-1,'"+action+"');\">APELLIDOS Y NOMBRES</th>"
+                            +"<th>CONV.</th>"
+                            +"<th>MODALIDAD</th>"
+                            +"<th onclick=\"ordenar('name_car',-1,'"+action+"');\">CARRERA</th>"
+                            +"<th>CANT. CICLO</th>"
+                            +"<th onclick=\"ordenar('pro_global',-1,'"+action+"');\">PROMEDIO</th>"
+                            +"<th>state</th>"
+                          +"</tr>"
+                        +"</thead>";
+                      for( i in dt ){
+                        var bg_color = "white";
+                        for( var h=0; h<becario.length; h++ ){
+                          if(dt[i].state == becario[h].color_simb){
+                            bg_color = becario[h].bg_color;
+                          }
+                        }
+                        var linkExp = "";
+                        if( dt[i].exp != null && dt[i].exp!= "" ){
+                          linkExp = "<a href='https://intranet.pronabec.gob.pe/Becario/Expediente/"+dt[i].exp+"' target='_blank' style='color:red;'><i class='fa fa-fw fa-lg fa-search text-primary' title='ver expediente'></i></a> ";
+                        }
+                        dh+="<tr id='id_bec_"+dt[i].id_becario+"' tabindex='1'>"
+                          +"<td>"+(parseInt(i)+1)+"</td>"
+                          +"<td>"+linkExp+dt[i].nombresc+"</td>"
+                          +"<td><span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[i].anio_convocatory+"',name_ins:'"+dt[i].name_ins+"',becario_select:'"+dt[i].id_becario+"'}, 'select_convocaroty');\">"+dt[i].anio_convocatory+"</span></td>"
+                          +"<td><span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[i].anio_convocatory+"',name_ins:'"+dt[i].name_ins+"',sede: '"+dt[i].sede+"',name_car: '"+dt[i].name_car+"',becario_select:'"+dt[i].id_becario+"'}, 'select_carrera');\">"+dt[i].modalidad+"</span></td>"
+                          +"<td><span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[i].anio_convocatory+"',name_ins:'"+dt[i].name_ins+"',sede: '"+dt[i].sede+"',name_car: '"+dt[i].name_car+"',becario_select:'"+dt[i].id_becario+"'}, 'select_carrera');\">"+dt[i].name_car+"</span></td>"
+                          
+            
+                          +"<td><span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[i].anio_convocatory+"',name_ins:'"+dt[i].name_ins+"',sede: '"+dt[i].sede+"',name_car: '"+dt[i].name_car+"',becario_select:'"+dt[i].id_becario+"',modalidad:'"+dt[i].modalidad+"'}, 'select_ciclos');cant_ciclo="+dt[i].cant_ciclo+";\">I...";
+                          if( dt[i].name_ins == 'ICPNA' )
+                            dh+=dt[i].cant_ciclo;
+                          else{
+                            var cicloLast= ciclo[parseInt(dt[i].cant_ciclo)-1]; 
+                            dh+=cicloLast==undefined?'S/N':cicloLast;
+                          }
+                          dh+="</span></td>"
+                          +"<td>"+dt[i].pro_global+"</td>"
+                          +"<td style='background-color:"+bg_color+";'></td>"
+                        +"</tr>";
+                      }
+                      break;
+                    case 'select_institution':
+                      dh = cadena_section(dt,1,2);
+                      
+                      dh +="<div>"+dt[0].name_ins+" </div>"  
+                          +"<table border='1' width='100%' class='tablesorter'>"
+                          +"<thead>"
+                            +"<tr>"
+                              +"<th>N°</th>"
+                              +"<th onclick=\"ordenar('nombresc',-1,'"+action+"');\">APELLIDOS Y NOMBRES</th>"
+                              +"<th>SEDE</th>"
+                              +"<th>CONV.</th>"
+                              +"<th onclick=\"ordenar('name_car',-1,'"+action+"');\">CARRERA</th>"
+                              +"<th>CANT. CICLO</th>"
+                              +"<th onclick=\"ordenar('pro_global',-1,'"+action+"');\">PROMEDIO</th>"
+                              +"<th>state</th>"
+                            +"</tr>"
+                          +"</thead>";
+                      for( i in dt ){
+                        var bg_color = "white";
+                        for( var h=0; h<becario.length; h++ ){
+                          if(dt[i].state == becario[h].color_simb){
+                            bg_color = becario[h].bg_color;
+                          }
+                        }
+            
+                        dh+="<tr id='id_bec_"+dt[i].id_becario+"' tabindex='1'>"
+                          +"<td>"+(parseInt(i)+1)+"</td>"
+                          +"<td>"+dt[i].nombresc+"</td>"
+                          +"<td><span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[i].anio_convocatory+"',name_ins:'"+dt[i].name_ins+"',sede: '"+dt[i].sede+"',becario_select:'"+dt[i].id_becario+"'}, 'select_institution_x_sede');\">"+dt[i].sede+"</span></td>"
+                          +"<td><span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[i].anio_convocatory+"',name_ins:'"+dt[i].name_ins+"',becario_select:'"+dt[i].id_becario+"'}, 'select_convocaroty');\">"+dt[i].anio_convocatory+"</span></td>"
+                          +"<td><span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[i].anio_convocatory+"',name_ins:'"+dt[i].name_ins+"',sede: '"+dt[i].sede+"',name_car: '"+dt[i].name_car+"',becario_select:'"+dt[i].id_becario+"'}, 'select_carrera');\">"+dt[i].name_car+"</span></td>"
+                          +"<td><span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[i].anio_convocatory+"',name_ins:'"+dt[i].name_ins+"',sede: '"+dt[i].sede+"',name_car: '"+dt[i].name_car+"',becario_select:'"+dt[i].id_becario+"',modalidad:'"+dt[i].modalidad+"'}, 'select_ciclos');cant_ciclo="+dt[i].cant_ciclo+";\">I...";
+                          if( dt[i].name_ins == 'ICPNA' )
+                            dh+=dt[i].cant_ciclo;
+                          else{
+                            var cicloLast= ciclo[parseInt(dt[i].cant_ciclo)-1]; 
+                            dh+=cicloLast==undefined?'S/N':cicloLast;
+                          }
+            
+                          dh+="</span></td>"
+                          +"<td>"+dt[i].pro_global+"</td>"
+                          +"<td style='background-color:"+bg_color+";'></td>"
+                        +"</tr>";
+                      }
+                      break;
+                    case 'select_convocaroty':
+                      
+                      dh = cadena_section(dt,0,2);
+                      dh +="<div>CONV."+dt[0].anio_convocatory+"</div>" 
+                          +"<table border='1' width='100%' class='tablesorter'>"
+                          +"<thead>"
+                            +"<tr>"
+                              +"<th>N°</th>"
+                              +"<th onclick=\"ordenar('nombresc',-1,'"+action+"');\">APELLIDOS Y NOMBRES</th>"
+                              +"<th>INSTITUCIÓN</th>"
+                              +"<th>SEDE</th>"
+                              +"<th onclick=\"ordenar('name_car',-1,'"+action+"');\">CARRERA</th>"
+                              +"<th>CANT. CICLO</th>"
+                              +"<th onclick=\"ordenar('pro_global',-1,'"+action+"');\">PROMEDIO</th>"
+                              +"<th>state</th>"
+                            +"</tr>"
+                          +"</thead>";
+                      for( i in dt ){
+                        var bg_color = "white";
+                        for( var h=0; h<becario.length; h++ ){
+                          if(dt[i].state == becario[h].color_simb){
+                            bg_color = becario[h].bg_color;
+                          }
+                        }
+            
+                        dh+="<tr id='id_bec_"+dt[i].id_becario+"' tabindex='1'>"
+                          +"<td>"+(parseInt(i)+1)+"</td>"
+                          +"<td>"+dt[i].nombresc+"</td>"
+                          +"<td><span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[i].anio_convocatory+"',name_ins:'"+dt[i].name_ins+"',becario_select:'"+dt[i].id_becario+"'}, 'select_institution');\">"+dt[i].name_ins+"</span></td>"
+                          +"<td><span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[i].anio_convocatory+"',name_ins:'"+dt[i].name_ins+"',sede: '"+dt[i].sede+"',becario_select:'"+dt[i].id_becario+"'}, 'select_institution_x_sede');\">"+dt[i].sede+"</span></td>"
+                          +"<td><span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[i].anio_convocatory+"',name_ins:'"+dt[i].name_ins+"',sede: '"+dt[i].sede+"',name_car: '"+dt[i].name_car+"',becario_select:'"+dt[i].id_becario+"'}, 'select_carrera');\">"+dt[i].name_car+"</span></td>"
+                          +"<td><span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[i].anio_convocatory+"',name_ins:'"+dt[i].name_ins+"',sede: '"+dt[i].sede+"',name_car: '"+dt[i].name_car+"',becario_select:'"+dt[i].id_becario+"',modalidad:'"+dt[i].modalidad+"'}, 'select_ciclos');cant_ciclo="+dt[i].cant_ciclo+";\">I...";
+                          if( dt[i].name_ins == 'ICPNA' )
+                            dh+=dt[i].cant_ciclo;
+                          else{
+                            var cicloLast= ciclo[parseInt(dt[i].cant_ciclo)-1]; 
+                            dh+=cicloLast==undefined?'S/N':cicloLast;
+                          }
+                          dh+="</span></td>"
+                          +"<td>"+dt[i].pro_global+"</td>"
+                          +"<td style='background-color:"+bg_color+";'></td>"
+                        +"</tr>";
+                      }
+                      break;
+                    default:
+                      dh += cadena_section(dt,-1,-1);
+                      dh += "<table border='1' width='100%' class='tablesorter'>"
+                          +"<thead>"
+                            +"<tr>"
+                              +"<th>N°</th>"
+                              +"<th>DNI</th>"
+                              +"<th onclick=\"ordenar('name_per',-1,'"+action+"');\">NOMBRE</th>"
+                              +"<th onclick=\"ordenar('lastname_per',-1,'"+action+"');\">APELLIDO</th>"
+                              +"<th onclick=\"ordenar('anio_convocatory',-1,'"+action+"');\">CONV.</th>"
+                              +"<th onclick=\"ordenar('modalidad',-1,'"+action+"');\">MODALIDAD</th>"
+                              +"<th onclick=\"ordenar('name_ins',-1,'"+action+"');\">INSTITUCIÓN</th>"
+                              +"<th onclick=\"ordenar('sede',-1,'"+action+"');\">SEDE</th>"
+                              +"<th onclick=\"ordenar('name_car',-1,'"+action+"');\">CARRERA</th>"
+                              +"<th>state</th>"
+                              // +"<th onclick=\"ordenar('state',-1,'"+action+"');\">ESTADO</th>"
+                            +"</tr>"
+                          +"</thead>";
+                      for( var i in dt ){
+                        var bg_color = "white";
+                        for( var h=0; h<becario.length; h++ ){
+                          if(dt[i].state == becario[h].color_simb){
+                            bg_color = becario[h].bg_color;
+                          }
+                        }
+                        var linkExp = "";
+                        if( dt[i].exp != null && dt[i].exp!= "" ){
+                          linkExp = "<a href='https://intranet.pronabec.gob.pe/Becario/Expediente/"+dt[i].exp+"' target='_blank' style='color:red;'><i class='fa fa-fw fa-lg fa-search text-primary' title='ver expediente'></i></a> ";
+                        }
+                        dh+="<tr tabindex='1'>"
+                          +"<td>"+(parseInt(i)+1)+"</td>"
+                          +"<td>"+linkExp+dt[i].dni+"</td>"
+                          +"<td title='id_bec: "+dt[i].id_becario+"'>"+dt[i].name_per+"</td>"
+                          +"<td>"+dt[i].lastname_per+"</td>"
+                          +"<td><span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[i].anio_convocatory+"',name_ins:'"+dt[i].name_ins+"',becario_select:'"+dt[i].id_becario+"'}, 'select_convocaroty');\">"+dt[i].anio_convocatory+"</span></td>"
+                          +"<td>"+dt[i].modalidad+"</td>"
+            
+                          +"<td><span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[i].anio_convocatory+"',name_ins:'"+dt[i].name_ins+"',becario_select:'"+dt[i].id_becario+"'}, 'select_institution');\">"+dt[i].name_ins+"</span></td>"
+            
+                          +"<td><span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[i].anio_convocatory+"',name_ins:'"+dt[i].name_ins+"',sede: '"+dt[i].sede+"',becario_select:'"+dt[i].id_becario+"'}, 'select_institution_x_sede');\">"+dt[i].sede+"</span></td>"
+            
+                          +"<td><span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[i].anio_convocatory+"',name_ins:'"+dt[i].name_ins+"',sede: '"+dt[i].sede+"',name_car: '"+dt[i].name_car+"',becario_select:'"+dt[i].id_becario+"'}, 'select_carrera');\">"+dt[i].name_car+"</span></td>"
+                          +"<td style='background-color:"+bg_color+";'></td>"
+            
+                          // +"<td>"+dt[i].state+"</td>"
+                        +"</tr>";
+                      }
+                      break;
+                  }
+                    
+                    dh+="</table>";
+                  return dh;
+                }
+                
+                function cadena_section(dt,init,nivel){
+                  // alert("jaja");
+                  // alert(active_only);
+                  var dh = "<div>";
+                  dh+="<table border=1>"
+                    +"<tr>"
+                      +"<td style='background-color:#C5F6FD;' class='pointer' onclick=\"active_only = false;document.getElementById('active_only').checked = false;search({state:'AE'}, 'search_becario');\">Egresado</td>"
+                      +"<td style='background-color:#FFF6B9;' class='pointer' onclick=\"active_only = false;document.getElementById('active_only').checked = false;search({state:'O'}, 'search_becario');\">Observado</td>"
+                      +"<td style='background-color:#FFCDCD;' class='pointer' onclick=\"active_only = false;document.getElementById('active_only').checked = false;search({state:'E',option:''}, 'search_becario');\">Ex-becario</td>";
+                      if( active_only )
+                        dh+="<td style='background-color:white;'>&nbsp;&nbsp;<input type='checkbox' id='active_only' checked> Solo activos</td>";
+                      else
+                        dh+="<td style='background-color:white;'>&nbsp;&nbsp;<input type='checkbox' id='active_only'> Solo activos</td>";
+                    dh+="</tr></table>"
+                  +"<br>"
+                  +"<div style='color:#6056DD;'>Busqueda: \"<b id='searchName'>"+$("#word").val()+"</b>\" <br><b>"+dt.length+" registros</b>  <span id='execution_time' style='color:#B2B2B2;'></span></div>";
+                  console.log(dt[0]);
+                  // alert("entro");
+                  // for( var lv_section=init;lv_section<nivel;lv_section++ ){
+                  //   if( lv_section == 0 ){
+                  //     dh+="<span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[0].anio_convocatory+"',name_ins:'"+dt[0].name_ins+"',becario_select:'0'}, 'select_institution');\">"+dt[0].name_ins+"</span>";            
+                  //   }
+                  //   if( lv_section == 1 ){
+                  //     dh+=" > "+"<span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[0].anio_convocatory+"',name_ins:'"+dt[0].name_ins+"',sede: '"+dt[0].sede+"',becario_select:'0'}, 'select_institution_x_sede');\">"+dt[0].sede;
+                  //   }
+                  //   if( lv_section == 2 ){
+                  //     dh+=" > "+"<span style='color:blue;cursor:pointer;' onclick=\"search({anio_convocatory:'"+dt[0].anio_convocatory+"',name_ins:'"+dt[0].name_ins+"',sede: '"+dt[0].sede+"',name_car: '"+dt[0].name_car+"',becario_select:'0'}, 'select_carrera');\">"+dt[0].name_car;
+                  //   }
+                  //   if( lv_section == 3 ){
+                  //       dh+=' > <span style="font-weight:bold;color:orange;">"'+dt[0].modalidad+'"</span>';
+                  //       dh+="</span>&nbsp;&nbsp;&nbsp;<button onclick='exportar()' style='color:#EEEEEE;background-color:#549D34;' title='Exportar datos para Excel'><b>Exportar</b></button>";
+                        
+                      
+                  //     dh+="</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button onclick='search(search_aux.data,search_aux.action);'><img src='ico/update.png' style='width:25px' title='Actualizar'></button>";
+                  //   }
+                  // }
+                  
+                  // dh+="&nbsp;&nbsp;&nbsp;<button onclick='exportar()' download='your-foo.csv' style='color:#EEEEEE;background-color:#549D34;'><b>Exportar</b></button>";
+                  // dh+=" &nbsp;&nbsp;<button onclick='search(search_aux.data,search_aux.action);'>actualizar</button>"
+                  dh+="</div>";
+                  return dh;
+                }
+              var name_perBool = -1;
+              var lastname_perBool= -1;
+              var anio_convocatoryBool= -1;
+              var modalidadBool= -1;
+              var name_insBool= -1;
+              var sedeBool= -1;
+              var name_carBool= -1;
+              var stateBool= -1;
+              var nombrescBool= -1;
+              var cant_cicloBool= -1;
+              var pro_globalBool= -1;
+            
+              function ordenar(campo, bool,action){
+            
+                // alert("jaja");
+                switch(campo){
+                  case 'name_per':
+                    name_perBool = name_perBool * bool;
+                    // alert(objAux.length);
+            
+                    objAux = objAux.sort(function (a, b) {
+            
+                      if( name_perBool == 1 ){
+                         if (a.name_per < b.name_per) return -1;
+                         if (a.name_per > b.name_per) return 1;
+                      }else{
+                         if (a.name_per > b.name_per) return -1; 
+                         if (a.name_per < b.name_per) return 1;
+                      }
+                      
+            
+                      return 0;
+                    });
+                    break;
+                  case 'lastname_per':
+                    lastname_perBool = lastname_perBool * bool;
+                    objAux = objAux.sort(function (a, b) {
+                      if( lastname_perBool == 1 ){
+                         if (a.lastname_per < b.lastname_per) return -1;
+                         if (a.lastname_per > b.lastname_per) return 1;
+                      }else{
+                         if (a.lastname_per > b.lastname_per) return -1; 
+                         if (a.lastname_per < b.lastname_per) return 1;
+                      }
+                      return 0;
+                    });
+                    break;
+                  case 'nombresc':
+                    nombrescBool = nombrescBool * bool;
+                    // alert(objAux.length);
+            
+                    objAux = objAux.sort(function (a, b) {
+                      if( nombrescBool == 1 ){
+                         if (a.nombresc < b.nombresc) return -1;
+                         if (a.nombresc > b.nombresc) return 1;
+                      }else{
+                         if (a.nombresc > b.nombresc) return -1; 
+                         if (a.nombresc < b.nombresc) return 1;
+                      }
+                      return 0;
+                    });
+                    break;
+                  case 'anio_convocatory':
+                  // alert("entro");
+                    anio_convocatoryBool = anio_convocatoryBool * bool;
+                    objAux = objAux.sort(function (a, b) {
+                      if( anio_convocatoryBool == 1 ){
+                         if (a.anio_convocatory < b.anio_convocatory) return -1;
+                         if (a.anio_convocatory > b.anio_convocatory) return 1;
+                      }else{
+                         if (a.anio_convocatory > b.anio_convocatory) return -1; 
+                         if (a.anio_convocatory < b.anio_convocatory) return 1;
+                      }
+                      return 0;
+                    });
+                    break;
+                  case 'modalidad':
+                  // alert("netro");
+                    modalidadBool = modalidadBool * bool;
+                    objAux = objAux.sort(function (a, b) {
+                      if( modalidadBool == 1 ){
+                         if (a.modalidad < b.modalidad) return -1;
+                         if (a.modalidad > b.modalidad) return 1;
+                      }else{
+                         if (a.modalidad > b.modalidad) return -1; 
+                         if (a.modalidad < b.modalidad) return 1;
+                      }
+                      return 0;
+                    });
+                    break;
+                  case 'name_ins':
+                    name_insBool = name_insBool * bool;
+                    objAux = objAux.sort(function (a, b) {
+                      if( name_insBool == 1 ){
+                        if (a.name_ins < b.name_ins) return -1;
+                         if (a.name_ins > b.name_ins) return 1;
+                      }else{
+                         if (a.name_ins > b.name_ins) return -1; 
+                         if (a.name_ins < b.name_ins) return 1;
+                      }
+                      return 0;
+                    });
+                    break;
+                  case 'sede':
+                    sedeBool = sedeBool * bool;
+                    objAux = objAux.sort(function (a, b) {
+                      if( sedeBool == 1 ){
+                        if (a.sede < b.sede) return -1;
+                         if (a.sede > b.sede) return 1;
+                      }else{
+                         if (a.sede > b.sede) return -1; 
+                         if (a.sede < b.sede) return 1;
+                      }
+                      return 0;
+                    });
+                    break;
+                  case 'name_car':
+                    name_carBool = name_carBool * bool;
+                    objAux = objAux.sort(function (a, b) {
+                      if( name_carBool == 1 ){
+                        if (a.name_car < b.name_car) return -1;
+                         if (a.name_car > b.name_car) return 1;
+                      }else{
+                         if (a.name_car > b.name_car) return -1; 
+                         if (a.name_car < b.name_car) return 1;
+                      }
+                      return 0;
+                    });
+                    break;
+                  case 'state':
+                    stateBool = stateBool * bool;
+                    objAux = objAux.sort(function (a, b) {
+                      if( stateBool == 1 ){
+                        if (a.state < b.state) return -1;
+                         if (a.state > b.state) return 1;
+                      }else{
+                         if (a.state > b.state) return -1; 
+                         if (a.state < b.state) return 1;
+                      }
+                      return 0;
+                    });
+                    break;
+                  
+                  case 'cant_ciclo':
+                    cant_cicloBool = cant_cicloBool * bool;
+                    objAux = objAux.sort(function (a, b) {
+                      if( cant_cicloBool == 1 ){
+                        if (a.cant_ciclo < b.cant_ciclo) return -1;
+                         if (a.cant_ciclo > b.cant_ciclo) return 1;
+                      }else{
+                         if (a.cant_ciclo > b.cant_ciclo) return -1; 
+                         if (a.cant_ciclo < b.cant_ciclo) return 1;
+                      }
+                      return 0;
+                    });
+                    break;
+                  case 'pro_global':
+                    pro_globalBool = pro_globalBool * bool;
+                    objAux = objAux.sort(function (a, b) {
+                      if( pro_globalBool == 1 ){
+                         if (parseFloat(a.pro_global) > parseFloat(b.pro_global) ) return -1;
+                         if (parseFloat(a.pro_global) < parseFloat(b.pro_global) ) return 1;
+                      }else{
+                        if (parseFloat(a.pro_global) < parseFloat(b.pro_global) ) return -1;
+                         if (parseFloat(a.pro_global) > parseFloat(b.pro_global) ) return 1;
+                      }
+                      return 0;
+                    });
+                    break;
+                  // case 'id_personal':
+                  //   id_personalBool = id_personalBool * bool;
+                  //   objAux = objAux.sort(function (a, b) {
+                  //     if( id_personalBool == 1 ){
+                  //       if (parseInt(a.id_personal) < parseInt(b.id_personal) ) {
+                  //         return 1;
+                  //       }
+                  //     }else{
+                  //       if (parseInt(a.id_personal) > parseInt(b.id_personal) ) {
+                  //         return 1;
+                  //       }
+                  //     }
+                  //     return 0;
+                  //   });
+                  //   break;
+                }
+                // setTimeout(function(){
+                 $("#tb_base_sort").html( create_structure(objAux, action) );
+                 $("#active_only").change(function(event) {
+                    /* Act on the event */
+                    if( $(this).is(":checked") ){
+                      active_only = true;
+                      checked_click = 2;
+                    }
+                    else{
+                      active_only = false;
+                      checked_click = 1;
+                    }
+                    // if(search_aux.action == undefined){
+                    //   search_aux.action = "search_becario";
+                    // }
+                    // alert(active_only);
+                    search(search_aux.data,search_aux.action);
+            
+                    // if(action == undefined){
+                    //   document.getElementById('active_only').checked = false;
+                    // }
+                  });
+                // },3000);
+              }
+          function exportar(){
+            var StringCSV = "";
+            var myTableArray = [];
+
+            //longitud total
+            // var row1 = $("table#tb_select_ciclos tr")[1].innerHTML;
+            // var long = $(row1).find(".sub_promedio").length;
+            // var long = document.getElementById('tb_select_ciclos').rows[1].cells.length
+            // var long = document.getElementById('tb_select_ciclos').rows[1].className = "sub_promedio";
+            // long = row1.find('td .sub_promedio').length;
+            // console.log(long);
+            //encabezado
+            StringCSV+= "Apellidos y Nombres";
+            for(var ii=1;ii<=ciclo_max[0];ii++){
+              StringCSV+=","+ii;
+            }
+            StringCSV+= ",Promedio\n";
+            $("table#tb_select_ciclos tr").each(function(key,value) {
+               arrayOfThisRow = [];
+                var tableData = $(this).find('td .sub_promedio');
+                // var tableData = $(this).find('td .sub_promedio');
+                // arrayOfThisRow[-1] = 
+                 
+
+                
+                if (tableData.length > 0) {
+                    tableData.each(function() {
+                      // arrayOfThisRow.push(fullName[key]);
+                      arrayOfThisRow.push($(this).text()); 
+                    });
+                    // console.log(arrayOfThisRow);
+                    StringCSV+= arrayOfThisRow.join(",");
+                    StringCSV+="\n";
+                    myTableArray.push(arrayOfThisRow);
+                }
+            });
+            // console.log(StringCSV);
+            var blob = new Blob([StringCSV], {
+                type: "text/plain;charset=utf-8;",
+            });
+            saveAs(blob, "data.csv");
+          }
+          // setTimeout(function(){
+          //   exportar();
+          // },10000);
+  </script>
+  <div id="floatwin1" setclick=".viewselect"></div>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <div class="my_toast2"></div>
+  <script>
+    $(document).ready(function() {
+      lt_toast('.my_toast2'); 
+
+    });
+  </script>
+
+
+
+</body>
+
+</html>

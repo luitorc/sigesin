@@ -1,0 +1,728 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.1/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+  <style>
+    .jumbotron-billboard .img {
+    margin-bottom: 0px;
+    opacity: 0.3;
+    color: #fff;
+    background: #000 url("img/log1.png") center center;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    overflow: hidden;
+  
+  
+    position:absolute;
+    top:0;left:0;
+    z-index:1;
+}
+.jumbotron {
+  position:relative;padding:50px;
+  text-align: center;
+}
+.jumbotron .container {z-index:2;
+ position:relative;
+  z-index:2;
+}
+
+  </style>
+</head>
+
+<body>
+<script src="js/socket.io.js"></script>
+  <!-- <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script> -->
+  <!-- <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script> -->
+  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+<script src="lib/FileSaver.js-master/fileSaver.js"></script>
+<script src="js/taffy.js"></script>
+<script type="text/javascript" src="js/soundjs-NEXT.combined.js"></script>
+<!-- <script src="db-js/software_necesario.js"></script> -->
+  <nav class="navbar navbar-toggleable-md navbar-light bg-faded">
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand" href="#"><b>SIGESIN</b>  </a>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto ">
+        <!-- <li class="nav-item active">
+          <a class="nav-link" href="#">Inicio <span class="sr-only">(current)</span></a>
+        </li> -->
+        
+      </ul>
+      <%if( !account ){%>
+      <form class="form-inline my-2 my-lg-0" action='/login'>
+        <button class="btn btn-outline-danger my-2 my-sm-0" type="submit" style='cursor:pointer;'>Ingresar</button>
+      </form>
+      <%}%>
+      <%if( account ){%>
+      <a href='user_panel'><button class="btn btn-outline-info my-2 my-sm-0" type="button" style='cursor:pointer;'>Panel de Control</button></a>&nbsp;&nbsp;&nbsp;&nbsp;
+      <a href="session_exit"><button class="btn btn-outline-danger my-2 my-sm-0" type="button" style='cursor:pointer;'>Cerrar Sessión</button></a>
+      <%}%>
+    </div>
+  </nav>
+  <div style="height:3px;background-color:red;"></div>
+
+  <div class="jumbotron jumbotron-billboard">
+    <div class="img"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <br>
+          <br>
+          <h1 class="display-1"><b>SIGESIN</b></h1>
+          <br>
+          <%if( !account ){%>
+          <a href="/login" class="btn btn-outline-primary btn-lg">Ingresar ahora!</a>
+          <%}else{%>
+          <span onclick="$('body').scrollTop(3000);$('#text1').focus();" class="btn btn-outline-danger btn-lg">Consultar Ahora</span>
+          <%}%>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% if( account ){ %>
+    <div class="p-y-3 section">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-5">
+            <img src="img/tecnico_soporte_informatico.jpg" class="img-fluid img-thumbnail">
+          </div>
+          <div class="col-md-6 col-md-offset-1">
+            <h1 class="text-primary">¿Que es SIGESIN?</h1>
+            <h5 class="text-danger">- NUEVO</h5>
+            <p class="lead text-justify">Es un sistema especializado en la solución de problemas informáticos en todos los órganos de la Institución de las Oficinas de PRONABEC-Moquegua que realice operaciones con el apoyo tecnológico, el cual comprende 3 módulos y requiere de un practicante especializado en informática como mínimo para brindar soluciones ante cualquier suceso inesperado por el usuario, el sistema brinda a cada usuario un medio de comunicación en tiempo real con el practicante de soporte informática y otros funcionarios.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+    <div class="p-y-3 section">
+      <div class="container">
+          <div class="row">
+            <div class="col-md-12">
+              <h4>Preguntas frecuentes</h4>
+              <hr>
+              <div id="accordion_frequent_questions" role="tablist" aria-multiselectable="true">
+                  
+                </div>
+            </div>
+          </div>
+      </div>
+    </div>
+    <br><br>
+    <div class="p-y-3 section">
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <h4 class="text-xs-center">Especialistas en Soporte Informatico</h4>
+            <hr class="" draggable="true">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-2 offset-md-2 text-center">
+            <img src="http://127.0.0.1:3000/img/personal/luis.torres.png" class="center-block img-circle img-fluid m-y m-y-1">
+            <h5>Luis Torres Carpio</h5>
+            <p>PRACTICANTE</p>
+          </div>
+          <div class="col-2 offset-md-1 text-center">
+            <img src="https://pingendo.github.io/pingendo-bootstrap/assets/user_placeholder.png" class="center-block img-circle img-fluid m-y m-y-1">
+            <h5>Anonimo 1</h5>
+            <p>Soporte 1</p>
+          </div>
+          <div class="col-2 offset-md-1 text-center ">
+            <img src="https://pingendo.github.io/pingendo-bootstrap/assets/user_placeholder.png" class="center-block img-circle img-fluid m-y m-y-1">
+            <h5>Anonimo 2</h5>
+            <p>Soporte 2</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      #software_necesarios_menu .col-md-1 img{
+        cursor: pointer;
+      }
+    </style>
+    <div class="p-y-3 section">
+      <div class="container">
+        <br><br>
+        <div class="row">
+          <div class="col-md-12">
+
+            <h4>Software Necesarios (Oficinas de Pronabec - Moquegua)</h4>
+            <hr>
+          </div>
+        </div>
+        <div class="row" id='software_necesarios_menu'>
+          <div class="col-md-1">
+            <img src="http://korud.com/wp-content/uploads/2017/02/winRAR-error.png" class='img-fluid' onclick="setSoftwareDetails('Winrar');">
+          </div>
+          <div class="col-md-1">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3c0JmZP1boBxM_MSYEqIP1T8icp91_Ws2KVE5N2V-sUQ06t8u" class='img-fluid' onclick="setSoftwareDetails('Eset Nod32 Antivirus');">
+            
+          </div>
+          <div class="col-md-1">
+            <img src="http://it.miami.edu/_assets/images/o365-logo.jpg" class='img-fluid' onclick="setSoftwareDetails('Office 365');">
+            
+          </div>
+          <div class="col-md-1">
+            <img src="https://imagenes.es.sftcdn.net/es/scrn/94000/94947/nitro-pro1400865798-100x100.png" class='img-fluid' onclick="setSoftwareDetails('Nitro Pro');">
+          </div>
+          <div class="col-md-1">
+            <img src="https://www.mercadoactual.es/imgproductos/img1020000/Big/impresora-multifuncional-samsung-sl-m4370lx-multifunction-43ppm-a4-sl-m4370lx-see.jpg" class='img-fluid' onclick="setSoftwareDetails('Samsung M4370');">
+          </div>
+          <div class="col-md-1">
+            <img src="https://screenshots.en.sftcdn.net/en/scrn/60000/60958/teamviewer-09-535x535.png" class='img-fluid' onclick="setSoftwareDetails('TeamViewer');">
+          </div>
+          <div class="col-md-1">
+            <img src="ico/inicio/skype-for-business.jpg" class='img-fluid ' onclick="setSoftwareDetails('Skype_emp');">
+          </div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-md-4  text-center" >
+            <img src="http://www.eset-la.com/images/download/img_nod32.jpg" id='img_sw' class="img-fluid">
+          </div>
+          <div class="col-md-8 text-justify" >
+          <div id="detalle"></div>
+          
+          <div style="position: absolute;bottom: 20;"><a href="" target="_blank" id='link_download'>Click Aqui para descargar</a></div>
+          </div>
+
+        </div>
+      </div>
+  </div>
+  <br>
+  <div class="p-y-3 section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h4>Consultas en tiempo real</h4>
+          <hr>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+    
+
+
+
+
+<script>
+var db_sone,db_frqu;
+
+$.getJSON('db-js/software_necesario.json', function(data) {
+  console.log(CSV(data));
+
+  var blob = new Blob([CSV(data)], {
+    type: "text/plain;charset=utf-8;",
+    // type: "text/plain;charset=utf-8;",
+  });
+  // saveAs(blob, "data.txt");
+  // return;
+
+  db_sone = TAFFY(data);
+  setSoftwareDetails("Winrar");
+});
+function CSV(array) {
+    // Use first element to choose the keys and the order
+    var keys = Object.keys(array[0]);
+
+    // Build header
+    var result = keys.join("\t") + "\n";
+
+    // Add the rows
+    array.forEach(function(obj){
+        keys.forEach(function(k, ix){
+            if (ix) result += "\t";
+            result += obj[k];
+        });
+        result += "\n";
+    });
+
+    return result;
+}
+$.getJSON('db-js/frequent_questions.json', function(data) {
+  db_frqu = TAFFY(data);
+  setFrequent_questions();
+});
+function setSoftwareDetails(name){
+  var dt = db_sone({name:name}).get();
+  // console.log(dt);
+  $("#detalle").html( dt[0].detalle );
+  $("#link_download").attr('href', dt[0].link_download );
+  // console.log( dt[0].detalle );
+  $("#img_sw").attr("src",dt[0].img_sw);
+}
+function setFrequent_questions(){
+  var dt = db_frqu().get();
+  // console.log(dt);
+  var list="";
+  for( i in dt ){
+     list += "<div class='card'>"
+    +"  <div class='card-header' role='tab' id='heading_"+i+"'>"
+    +"    <h5 class='mb-0'>"
+    +"      <a data-toggle='collapse' data-parent='#accordion_frequent_questions' href='#collapse_"+i+"' aria-expanded='true' aria-controls='collapse_"+i+"'>"
+    +"        "+dt[i].pregunta
+    +"      </a>"
+    +"    </h5>"
+    +"  </div>"
+
+    +"  <div id='collapse_"+i+"' class='collapse "+(i==0?"show":"")+"' role='tabpanel' aria-labelledby='heading_"+i+"'>"
+    +"    <div class='card-block' style='text-align: justify;'>"
+    +"      "+dt[i].respuesta
+    +"    </div>"
+    +"  </div>"
+    +"</div>";
+    
+  }
+  $("#accordion_frequent_questions").html(list);
+}
+</script>
+
+
+
+
+
+
+<!-- chattttttttttttttttttttttt -->
+<style>
+    #content_comments_list{
+      background-color: ;height: 60px;width:40px;border: 1px solid #ccc;
+    }
+    #base_content_comments_list{
+      background-color: ;width:40px;padding: 10px;text-align: left;
+
+    }
+    #alerta_msn{
+      border-radius:40px;background-color:#B23535;color:white;padding:4px 8px;
+    }
+    #base_chat_write{
+      width: ;
+
+    }
+    #comments_list{
+      width: 600px;
+      height: 360px;
+    }
+    #content_comments_list{
+      width: 600px;
+      height: 370px;
+
+    }
+    #content_btn{
+      width: 650px;
+    }
+  </style>
+  <div onclick="set_viewed()" id='base_chat_write'>
+    <table style="background-color: ;text-align: center;width: 600px;margin:auto;">
+      <tr>
+        <td><a href="?clis"><span id="alerta_msn"></span></a> </td>
+        <td style="color:blue;font-size:20px;font-weight: bold;">Soporte Informatico</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="3">
+          <div style="" align="left" id="base_content_comments_list">
+            <div width="100%" style="" id="content_comments_list">
+              <div style="overflow-y: scroll;height: 360px;margin: 5px;text-align: left;" id='comments_list'>
+                <!-- Contenido de chat -->
+              </div>
+            </div>
+            <div id="content_btn">
+              <textarea  cols="30" rows="2" id="text1" style="margin-top:6px;width: 530px;"></textarea>
+            <!-- <div style="position: absolute;margin-top: -40px;margin-left: 180px;"> -->
+              <button style="padding: 6px;cursor:pointer" onclick="send_msn();" id="btn_send_msn">Enviar</button>
+            <!-- </div>    -->        
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+    
+  </div>
+  
+  <script>
+  out_box = false;
+  $("#base_chat_write").mouseover(function() {
+    // i += 1;
+    out_box = false;
+    // $( this ).find( "span" ).text( "mouse over x " + i );
+  })
+  .mouseout(function() {
+    // $( this ).find( "span" ).text( "mouse out " );
+    out_box = true;
+  });
+  $( window ).resize(function() {
+    var alto = 200;
+    // var alto = $(window).height() -100;
+    var ancho = $(window).width();
+    // $("#comments_list").css({"height": (alto-12)+"px"});
+    // $("#content_comments_list").css({"height": (alto-4)+"px","width": (ancho-20)+"px"});
+    // $("#base_content_comments_list").css({"width": (ancho-20)+"px"});
+    lastListComments();
+  });
+  
+  var viewed = true;
+  var cbo = -1;
+  setInterval(function(){
+    cbo = cbo*-1;
+    if( !viewed && out_box ){
+      if( cbo == 1 ){
+        $("#base_chat_write").css({"background-color":"#FFE0E0"});
+      }else{
+        $("#base_chat_write").css({"background-color":"#FFFFFF"});
+      }     
+    }
+  },1000);
+
+//   $(window).on("navigate", function (event, data) {
+//   var direction = data.state.direction;
+//   if (direction == 'back') {
+//     // do something
+//     $("#content_btn").css({"position": "","top":""});
+//   }
+//   if (direction == 'forward') {
+//     // do something else
+//   }
+// });
+  var cont1 = 0;
+    $(document).ready(function() {
+
+      view_min_msnXuser();
+      $("#text1").keyup(function(e){
+        
+        switch(e.keyCode){
+          case 13:
+            send_msn();
+            break;
+        }
+      });
+
+      var alto = $(window).height() -100;
+      var ancho = $(window).width();
+      // $("#comments_list").css({"height": (alto-12)+"px"});
+      // $("#content_comments_list").css({"height": (alto-4)+"px","width": (ancho-20)+"px"});
+      // $("#base_content_comments_list").css({"width": (ancho-20)+"px"});
+      // alert();
+    });
+
+    function set_viewed(){
+      $.post('/viewed', {
+        id_user: 6
+        ,id_usuario: <%=cuenta.id_usuario%>
+      }, function(dt, textStatus, xhr) {
+        out_box = false;
+        viewed = true;
+        $("#base_chat_write").css({"background-color":"#FFFFFF"});
+      });
+    }
+    function animation(){
+      setTimeout(function(){
+        $("#text1").css({"background-color":"#FFB7B7"});
+      },150);
+      setTimeout(function(){
+        $("#text1").css({"background-color":"white"});
+      },300);
+      setTimeout(function(){
+        $("#text1").css({"background-color":"#FFB7B7"});
+      },450);
+      setTimeout(function(){
+        $("#text1").css({"background-color":"white"});
+      },600);
+    }
+
+    var lastMsnme =false;
+    var lastDate;
+    function view_min_msnXuser(){
+      $.post('/min_msnXuser', {
+        user_emit: <%=cuenta.id_usuario%>
+        ,user_recept: 6
+      }, function(dt, textStatus, xhr) {
+        /*optional stuff to do after success */
+        var dh = "",bg_color,text_color,border;
+        lastMsnme=false;
+        for( i in dt ){
+          if( dt[i].user_emit == <%=cuenta.id_usuario%> ){
+            bg_color="#E4E4E4";
+            text_color="#323232;font-weight:bold;";
+            border = "3px 6px 6px 3px";
+            lastMsnme = true;
+          }else{
+            bg_color="#F4F4F4";
+            text_color="";
+            border = "";
+            lastMsnme = false;
+          }
+          // Fecha
+          if( i == 0 ){
+            lastDate = dt[i].date1.split("T")[0];
+            dh+="<div style='text-align:center;background-color:#BF1F1F;color:white;padding:3px;font-weight:bold;'>"+lastDate+"</div>"
+          }else{
+            var date = dt[i].date1.split("T")[0];
+            if( date != lastDate ){
+              dh+="<div style='text-align:center;background-color:#BF1F1F;color:white;padding:3px;font-weight:bold;'>"+date+"</div>"
+              lastDate = dt[i].date1.split("T")[0];
+            }
+          }
+            dh+="<div style='padding:2px;background-color:"+bg_color+";border-radius:"+border+";color:"+text_color+"margin:2px;'>["+dt[i].time1.split(":")[0]+":"+dt[i].time1.split(":")[1]+"] "+dt[i].text1+"</div>";
+
+            
+        }
+        $("#comments_list").html(dh+"<div id='visto'></div>");
+        cont1++;
+        if( cont1 == 1 ){
+          viewed_verify();
+        }else{
+          lastListComments();
+          $("#visto").hide();
+        }
+        
+        
+        
+      });
+    }
+
+    function viewed_verify(){
+      // 
+      viewed = true;
+      if( lastMsnme ){
+        $.post('/get_viewed', {
+          id_usuario: <%=cuenta.id_usuario%>
+          ,id_user: 6
+        }, function(dt, textStatus, xhr) {
+          if( dt[0].viewed && dt[0].time_viewed != null ){
+            var date_viewed = dt[0].date_viewed.split("T")[0];
+            var c_viewed;
+            if( date_viewed != lastDate )
+              c_viewed = " de "+dt[0].date_viewed.split("T")[0];
+            else
+              c_viewed = "";
+
+
+            console.log("visto");
+            $("#visto").html("<span style='color:#8D8D8D;font-size:14px;'>visto "+dt[0].time_viewed+c_viewed+"</span>");
+            $("#visto").show();
+            lastListComments();
+
+          }else{
+            lastListComments();
+          }
+          // alert(dt);
+        });
+      }else{
+        lastListComments();
+      }
+      
+    }
+
+    function lastListComments(){
+      var high = $("#comments_list")[0].scrollHeight;
+      $("#comments_list").scrollTop(high);
+      // alert(high);
+    }
+    function send_msn(){
+      if( $("#text1").val() == "" || $("#text1").val().length == 1 ){
+
+        animation();
+        $("#text1").val("");
+        return;
+      }else{
+        $("#text1").focus();
+      }
+      $.post('/send_msn', {
+        text1: $("#text1").val()
+        ,src: "false"
+        ,user_emit: <%=cuenta.id_usuario%>
+        ,user_recept: 6
+        ,usuario_name: 'Luis Torres'
+      }, function(dt, textStatus, xhr) {
+        $("#text1").val("");
+        view_min_msnXuser();
+        $("#text1").focus();
+        
+      });
+    }
+  </script>
+
+<script type="text/javascript" >
+$(document).ready(function() {
+  mediaplayer_init();
+});
+  function mediaplayer_init() {
+    if (!createjs.Sound.initializeDefaultPlugins()) {
+      document.getElementById("error").style.display = "block";
+      document.getElementById("content").style.display = "none";
+      return;
+    }
+    createjs.Sound.alternateExtensions = ["mp3"]; 
+    createjs.Sound.addEventListener("fileload", createjs.proxy(handleLoadComplete, this)); // add an event 
+    createjs.Sound.registerSound("sound/tucutin1.mp3", "music");
+  }
+
+  var instance;
+  var positionInterval;
+  var seeking = false;
+
+  function handleLoadComplete(event) {
+    instance = createjs.Sound.play("music");
+    instance.stop();
+    instance.addEventListener("complete", function () {
+      clearInterval(positionInterval);
+    }); trackTime();
+  }
+
+  var dragOffset;
+  function trackTime() {
+    positionInterval = setInterval(function (event) {
+      if (seeking) return;
+      var porcentaje_carga = instance.getPosition() / instance.getDuration() * $("#track").width();
+    }, 30);
+  }
+</script>
+
+
+<!-- CHAT EN TIEMPO REAL -->
+<script>
+document.addEventListener('backbutton', onBackKeyDown, false);
+
+function onBackKeyDown(event) {
+    // Handle the back button
+    event.preventDefault();
+    alert('I am a demo purpose alert thingy');
+}
+var cont2 = 0;
+<% if( typeof cuenta != "undefined"){%>  
+  // var audioElement;
+  // audioElement = document.createElement('audio');
+  // audioElement.setAttribute('src', 'sound/tucutin1.mp3');
+
+  var ws = io();
+  $(document).on("ready", function(){
+    // alert("haha");
+    // return;
+    ws.on('chat_ping_res', function(id_user){
+      
+      // var time1 = setTimeout(function(){
+   //         $("#user_"+id_user).css({"color":"","text-shadow":""});
+   //       },5000);
+        removeSleep(id_user,4900);
+        $("#user_"+id_user).css({"color":"#00D900","text-shadow":"1px 1px 2px #999"});
+
+      // clearInterval(time1);
+      // console.log("#user_"+id_user);
+    });
+      msn_waiting();
+    ws.on('chat_msn_res', function(dt){
+      // console.log(dt);
+      // return;
+      if(dt.user_recept == <%=cuenta.id_usuario%> && dt.user_emit == 6 ){
+        
+          view_min_msnXuser();
+            out_box = true;
+            viewed = false;
+          
+        // ws.emit("notify_vibrador_req", dt);
+          instance.position=0;
+          instance.play();
+      }else{
+        if(dt.user_recept == <%=cuenta.id_usuario%>){
+          ws.emit("notify_req", dt);
+        
+          try{
+            instance.position=0;
+            instance.play();
+          }catch(ex){
+            // alert("no es compatible")
+          }
+          // audioElement.currentTime = 0;
+          // audioElement.play();
+          
+          cont2++;
+        }
+      }
+        // msn_waiting("cwri");
+      
+
+
+    });
+    setInterval(function(){
+      // instance.position=0;
+      // instance.play();
+    },2000);
+    ws.on('chat_viewed_res', function(dt){
+      if(dt.user_recept == 6 && dt.user_emit == <%=cuenta.id_usuario%> ){
+        viewed_verify();
+      }
+    });
+
+  });
+  function removeSleep(id_user,time){
+    setTimeout(function(){
+        $("#user_"+id_user).css({"color":"","text-shadow":""});
+        // callback1();
+      },time);
+  }
+  var user_emit = 6;
+
+  function msn_waiting(){
+    $.post('/msn_waiting', {id_usuario: <%=cuenta.id_usuario%>,user_emit: user_emit}, function(dt, textStatus, xhr) {
+      // location.reload();
+      if( dt[0].count == 0 )
+        $("#alerta_msn").hide();
+      else{
+        $("#alerta_msn").show().html(dt[0].count);
+      }
+    });
+    if(cont2 == 1){
+      // audioElement.currentTime = 0;
+      // audioElement.play();
+    } 
+  }
+  $(document).ready(function() {
+    ws.emit("chat_ping_req", <%=cuenta.id_usuario%>);
+  });
+  setInterval(function(){
+    ws.emit("chat_ping_req", <%=cuenta.id_usuario%>);
+  },5000);
+<% }%>
+
+
+</script>
+<br>
+  <br>
+  <br>
+  <br>
+  <br>
+<% } %>
+  <div style="height:3px;background-color:gray;"></div>
+  <div class="bg-faded section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h6 class="text-xs-center">
+            <br>Sigesin - Sitio Oficial / Developer by: www.tutiempoimporta.com </h6>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

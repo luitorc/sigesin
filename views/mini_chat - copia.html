@@ -1,0 +1,413 @@
+<% 
+// var data = Deasync(function(callback){
+// 	user_model.user_allData({id_usuario:1},function(obj1){
+
+// 		callback(obj1);
+// 	});
+// })();
+
+%>
+<% layout('layout/mini_chat.html') %>
+<% block('access',`
+<style>
+	.container{
+		margin: 10px;
+	}
+</style>
+<div class="container">
+	<div align="center">
+		<img src="img/access1.png" width="60%">
+	</div>
+	<form class="" action="/access">
+	<div class="form-group">
+	  <label>Correo</label>
+	  <input type="text" class="form-control"  name='usuario_name' value="" placeholder="Ingrese su user_name o correo registrado">
+	</div>
+	<br>
+	<div class="form-group">
+	  <label>Contraseña</label>
+	  <input type="password" class="form-control" name='password' value="" placeholder="Ingrese su contraseña registrada">
+	</div>
+	<input type="hidden" name="direccion" value="/mini_chat?clis">
+	<br>
+	<button type="submit" style="padding: 10px;">Ingresar</button>
+	</form>
+	
+</div>
+
+
+`) %>
+
+<!-- clis -->
+<% chat_list = function(dt){
+return `
+	<style>
+		#tb_user_list tr:hover{
+			
+			cursor: pointer;	
+			background-color: #EEEEEE;
+		}
+		#tb_user_list td{
+			padding: 4px 4px;
+		}
+		.user_active{
+			font-size:20px;
+			text-align: center;
+			color:#B5B5B5;
+		}
+		.cant_msn{
+			border-radius:40px;background-color:#B23535;color:white;padding:4px 8px;
+		}
+	</style>
+	<div width="100%" style="background-color: ;">
+		<table border=1 id="tb_user_list" width="100%" cellspacing='0' style="border-color:#F2F2F2;margin:auto;">
+			<tr>
+				<th colspan="3" style="background-color: #F2F2F2;">Lista de Contactos</th>
+			</tr>
+			<tr>
+				<td class='user_active'>■</td>
+				<td id_user=${dt[0].id_usuario}>${dt[0].usuario_name}</td>
+				<td align="center"> 
+					${dt[0].cant}
+				</td>
+			</tr>
+			<tr>
+				<td class='user_active'>■</td>
+				<td id_user=${dt[1].id_usuario}>${dt[1].usuario_name}</td>
+				<td align="center"> 
+					${dt[1].cant}
+				</td>
+			</tr>
+			<tr>
+				<td class='user_active'>■</td>
+				<td id_user=${dt[2].id_usuario}>${dt[2].usuario_name}</td>
+				<td align="center"> 
+					${dt[2].cant}
+				</td>
+			</tr>
+			<tr>
+				<td class='user_active'>■</td>
+				<td id_user=${dt[3].id_usuario}>${dt[3].usuario_name}</td>
+				<td align="center"> 
+					${dt[3].cant}
+				</td>
+			</tr>
+			<tr>
+				<td class='user_active'>■</td>
+				<td id_user=${dt[4].id_usuario}>${dt[4].usuario_name}</td>
+				<td align="center"> 
+					${dt[4].cant}
+				</td>
+			</tr>
+			<tr>
+				<td class='user_active'>■</td>
+				<td id_user=${dt[5].id_usuario}>${dt[5].usuario_name}</td>
+				<td align="center"> 
+					${dt[5].cant}
+				</td>
+			</tr>
+			<tr>
+				<td class='user_active'>■</td>
+				<td id_user=${dt[6].id_usuario}>${dt[6].usuario_name}</td>
+				<td align="center"> 
+					${dt[6].cant}
+				</td>
+			</tr>
+		</table>
+		<ul id="user_list">
+		</ul>
+	</div>
+	<script>
+	$(document).ready(function() {
+		$("#tb_user_list td").click(function(){
+			var user = $(this);
+			var id_user = user.attr("id_user");
+			$.post('/viewed', {
+				id_user: id_user
+				,id_usuario: ${usuario.id_usuario}
+			}, function(dt, textStatus, xhr) {
+				/*optional stuff to do after success */
+				window.location.href="?cwri&id_user="+id_user+"&name="+user.text()+"&chat_theme=${usuario.chat_theme}";
+			});
+			// alert(user.html() +" "+user.attr("id_user"));
+		});		
+	});
+	</script>
+`; 
+}%>
+<% jejeje = function (){
+	return "JOO";
+	}%>
+
+<!-- cwri -->
+<% chat_write = function(){
+var theme = [{
+				myText_color: "white"
+				,myText_bgcolor: "#5E78E9"
+				,otherText_color: "#070707"
+				,fecha_color: "#2323A4"
+			},{
+				myText_color: "white"
+				,myText_bgcolor: "#D57171"
+				,otherText_color: "#070707"
+				,fecha_color: "#AC253B"
+			},{
+				myText_color: ""
+				,otherText_color: ""
+				,fecha_color: ""
+			}];
+return `
+	<style>
+		#content_comments_list{
+			background-color: ;height: 60px;width:40px;border: 1px solid #ccc;
+		}
+		#base_content_comments_list{
+			background-color: #FFFFFF;width:40px;padding: 10px;text-align: left;
+		}
+		#alerta_msn{
+			border-radius:40px;background-color:#B23535;color:white;padding:4px 8px;
+		}
+	</style>
+	<div onclick="set_viewed()">
+		<table style="background-color: #EEEEEE;text-align: center;width: 100%;">
+			<tr>
+				<td><span onclick="window.location.href='?clis'">Volver <span id="alerta_msn"></span></a> </td>
+				<td style="color:blue;font-size:20px;font-weight: bold;">${params.name}</td>
+				<td><a href="?uinf&id_user=${params.id_user}&name=${params.name}&chat_theme=${params.chat_theme}">Info</a></td>
+			</tr>
+		</table>
+		<div width="300" style="" align="left" id="base_content_comments_list">
+			<div width="100%" style="" id="content_comments_list">
+				<div style="overflow-y: scroll;height: 60px;margin: 5px;text-align: left;" id='comments_list'>
+					<!-- Contenido de chat -->
+				</div>
+			</div>
+			<textarea  cols="22" rows="2" id="text1" style="margin-top:6px;width: 70%;"></textarea>
+			<!-- <div style="position: absolute;margin-top: -40px;margin-left: 180px;"> -->
+				<button style="padding: 6px;cursor:pointer" onclick="send_msn();" id="btn_send_msn">Enviar</button>
+			<!-- </div>		 -->
+		</div>
+	</div>
+	
+	<script>
+	var cont1 = 0;
+		$(document).ready(function() {
+
+			view_min_msnXuser();
+			$("#text1").keyup(function(e){
+				// alert(e.keyCode);
+				switch(e.keyCode){
+					case 13:
+						send_msn();
+						break;
+				}
+			});
+			// alert("jaja");
+			var alto = $(window).height() -100;
+			var ancho = $(window).width();
+			$("#comments_list").css({"height": (alto-12)+"px"});
+			$("#content_comments_list").css({"height": (alto-4)+"px","width": (ancho-20)+"px"});
+			$("#base_content_comments_list").css({"width": (ancho-20)+"px"});
+			// alert();
+		});
+		function set_viewed(){
+			$.post('/viewed', {
+				id_user: ${params.id_user}
+				,id_usuario: ${usuario.id_usuario}
+			}, function(dt, textStatus, xhr) {
+			});
+		}
+		function animation(){
+			setTimeout(function(){
+				$("#text1").css({"background-color":"#FFB7B7"});
+			},150);
+			setTimeout(function(){
+				$("#text1").css({"background-color":"white"});
+			},300);
+			setTimeout(function(){
+				$("#text1").css({"background-color":"#FFB7B7"});
+			},450);
+			setTimeout(function(){
+				$("#text1").css({"background-color":"white"});
+			},600);
+			// alert("entro");
+		}
+		function view_min_msnXuser(){
+			$.post('/min_msnXuser', {
+				user_emit: ${usuario.id_usuario}
+				,user_recept: ${params.id_user}
+			}, function(dt, textStatus, xhr) {
+				/*optional stuff to do after success */
+				var dh = "",bg_color,text_color,border,lastDate;
+				lastMsnme=false;
+				for( i in dt ){
+					if( dt[i].user_emit == ${usuario.id_usuario} ){
+						bg_color="${theme[params.chat_theme].myText_bgcolor}";
+						text_color="${theme[params.chat_theme].myText_color}";
+						border = "3px 6px 6px 3px";
+						lastMsnme = true;
+					}else{
+						bg_color="#F4F4F4";
+						text_color="";
+						border = "";
+						lastMsnme = false;
+					}
+					// Fecha
+					if( i == 0 ){
+						lastDate = dt[i].date1.split("T")[0];
+						dh+="<div style='text-align:center;background-color:${theme[params.chat_theme].fecha_color};color:white;padding:3px;font-weight:bold;'>"+lastDate+"</div>"
+					}else{
+						var date = dt[i].date1.split("T")[0];
+						if( date != lastDate ){
+							dh+="<div style='text-align:center;background-color:${theme[params.chat_theme].fecha_color};color:white;padding:3px;font-weight:bold;'>"+lastDate+"</div>"
+							lastDate = dt[i].date1.split("T")[0];
+						}
+					}
+						dh+="<div style='padding:2px;background-color:"+bg_color+";border-radius:"+border+";color:"+text_color+";margin:2px;'>["+dt[i].time1.split(":")[0]+":"+dt[i].time1.split(":")[1]+"] "+dt[i].text1+"</div>";
+
+						
+				}
+				$("#comments_list").html(dh+"<div id='visto'></div>");
+				cont1++;
+				if( cont1 == 1 ){
+					viewed_verify();
+				}else{
+					lastListComments();
+					$("#visto").hide();
+				}
+				
+				
+				
+			});
+		}
+		function viewed_verify(){
+			if( lastMsnme ){
+				$.post('/get_viewed', {
+					id_usuario: ${usuario.id_usuario}
+					,id_user: ${params.id_user}
+				}, function(dt, textStatus, xhr) {
+					if( dt[0].viewed && dt[0].time_viewed != null ){
+						// alert("visto");
+						$("#visto").html("<span style='color:#8D8D8D;'>visto a las "+dt[0].time_viewed+"</span>");
+						$("#visto").show();
+						lastListComments();
+
+					}
+				});
+			}
+			
+		}
+		function lastListComments(){
+			var high = $("#comments_list")[0].scrollHeight;
+			$("#comments_list").scrollTop(high);
+			// alert(high);
+		}
+		function send_msn(){
+			if( $("#text1").val() == "" || $("#text1").val().length == 1 ){
+
+				animation();
+				$("#text1").val("");
+				return;
+			}else{
+				$("#text1").focus();
+			}
+			$.post('/send_msn', {
+				text1: $("#text1").val()
+				,src: "false"
+				,user_emit: ${usuario.id_usuario}
+				,user_recept: ${params.id_user}
+			}, function(dt, textStatus, xhr) {
+				$("#text1").val("");
+				view_min_msnXuser();
+				$("#text1").focus();
+				
+			});
+		}
+	</script>
+`;
+} %>
+<!-- uinf -->
+<% user_info = function(dt){
+	var dh = `<style>
+		#user_list li:hover{
+			background-color: yellow;
+			cursor: pointer;	
+
+		}
+		#tb_dato_personal td{
+			padding: 4px;
+		}
+		#alerta_msn{
+			border-radius:40px;background-color:#B23535;color:white;padding:4px 8px;
+		}
+	</style>
+	<table style="background-color: #EEEEEE;text-align: center;width: 100%;">
+		<tr>
+			<td><a href="?cwri&id_user=${params.id_user}&&name=${params.name}&chat_theme=${params.chat_theme}">Volver</a></td>
+			<td>${params.name}</td>
+			<td><a href="?clis">Lista <span id="alerta_msn"></span></a></td>
+		</tr>
+	</table>
+	<div  style="background-color: ;padding: 2px;">
+		<table border="1" width="100%" cellspacing="0" id='tb_dato_personal' style="margin: auto;border-color: #EDEDED;padding: 4px;">
+			<tr>
+				<td colspan="2" align="center">
+					<img src="img/user.png" width="100"> 
+				</td>
+			</tr>
+			<tr>
+				<td width="30%">Nombres:</td>
+				<td id="nombres">${dt[0].nombres}</td>
+			</tr>
+			<tr>
+				<td>Apellidos:</td>
+				<td id="apellidos">${dt[0].apellidos}</td>
+			</tr>
+			<tr>
+				<td>Area:</td>
+				<td id="area">${dt[0].area}</td>
+			</tr>
+			<tr>
+				<td>Telf 1:</td>
+				<td id="celular1">${dt[0].celular1}</td>
+			</tr>
+			<tr>
+				<td>Telf 2:</td>
+				<td id="celular2">${dt[0].celular2}</td>
+			</tr>
+			<tr>
+				<td>Correo:</td>
+				<td id="correo">${dt[0].correo.split('@')[0]}<br>@${dt[0].correo.split('@')[1]}</td>
+			</tr>
+			<tr>
+				<td>Dirección:</td>
+				<td id="direccion">${dt[0].direccion}</td>
+			</tr>
+		</table>
+		
+	
+	</div>
+	<!-- ${params.id_user} -->
+	<script>
+	$(document).ready(function() {
+		$("#user_list li").click(function(){
+			var user = $(this);
+			var id_user = user.attr("id_user");
+			window.location.href="?cwri&id_user="+id_user+"&name="+user.text();
+		});
+
+	});
+	</script>`
+	return dh;
+}%>
+
+
+
+
+
+
+
+
+
+
+

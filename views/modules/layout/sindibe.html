@@ -1,0 +1,76 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <%-init.head%>
+  <script type="text/javascript" src="js/luitorc.js"></script>
+  <%-init.foot%>
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+<div id="array1"></div>
+<script>
+  // var arr = ["juan","pedro","marcos"];
+  // arr.splice(2,1);
+  // $("#array1").html(arr.toString());
+</script>
+  <div class="section">
+    <div class="container">
+      <div class="row" id="menu">
+        <div class="col-md-12 text-xs-center">
+          <div class="btn-group">
+            <a href="?dfbm" class="btn btn-primary" id="dfbm">Difusión FB masiva</a>
+            <a href="?pweb" class="btn btn-primary" id="pweb">Publicación en Web</a>
+            <a href="?mapl" class="btn btn-primary" id="mapl">Mensajeria a app</a>
+            <a href="?mmov" class="btn btn-primary" id="mmov">Mensajeria movil</a>
+          </div>
+        </div>
+      </div>
+      
+      <% mSelect="" ; 
+      if( typeof params.pweb !='undefined' ){ 
+          mSelect="pweb" ;
+      %> 
+      <%-pweb()%> 
+        <%} else if( typeof params.mapl !='undefined' ){
+         mSelect="mapl" ;
+        %> 
+      <%-mapl()%> 
+      <%} else if( typeof params.mmov !='undefined' ){ 
+        mSelect="mmov";
+      %> 
+      <%-mmov()%> 
+      <%} else if( typeof params.dfbm !='undefined' ){ 
+        mSelect="dfbm";
+      %> 
+      <%-dfbm()%> 
+      <%}%>
+    </div>
+  </div>
+  
+  <script>
+    $(document).ready(function() {
+      $("#<%=mSelect%>").addClass('active');
+    });
+  	function extraer(){
+  		// console.log($("#menu .btn-group a")[0].removeClass('active'));
+  		// alert( $("#menu").attr("href"));
+  		// $("#menu .btn-group a").each(function(indice, elemento) {
+  		// 	alert(elemento.removeClass('active'));
+  		// });
+  		// alert( );
+  	}
+  </script>
+
+
+
+
+
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,40 @@
+{
+  "name": "sigesin",
+  "version": "1.0.0",
+  "description": "Sistema para fines educativos",
+  "main": "server.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "dependencies": {
+    "body-parser": "^1.15.1",
+    "consolidate": "^0.8.0",
+    "deasync": "^0.1.9",
+    "colors": "^1.1.2",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.13.4",
+    "ejs-mate": "^2.3.0",
+    "dbf-parser": "^0.0.1",
+    "ejs": "^2.5.5",
+    "express-ejs-layouts": "^2.2.0",
+    "express-session": "^1.14.0",
+    "fast-csv": "^2.3.0",
+    "express-ejs-extend": "^0.0.1",
+    "node-pre-gyp": "^0.6.28",
+    "open": "^0.0.5",
+    "nopt": "^3.0.6",
+    "pg": "^6.1.2",
+    "npmlog": "^3.1.2",
+    "socket.io": "^1.4.6",
+    "jade": "^0.28.1",
+    "semver": "^5.1.1",
+    "sqlite3": "^3.1.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Luis Manuel Torres Carpio - 935422777",
+  "license": "ISC"
+}

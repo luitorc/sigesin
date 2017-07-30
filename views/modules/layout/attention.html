@@ -1,0 +1,415 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+  <!-- <iframe src="./modules/sigedo.html"></iframe> -->
+  <!-- <iframe src="./modules/sigedo.html"></iframe> -->
+  	<% if( typeof params.vgra != 'undefined'){ %>
+		<%-view_graphic()%>
+  	<%}else if( typeof params.vpre != 'undefined'){ %>
+		<%-view_previe()%>
+	<% }else{ %>
+	<%-init.head%>
+		<div class="section">
+		    <div class="container" align="center">
+		    	<div class="row">
+		    		<div class="col-lg-12">
+		    			<a href="/register_attention?rdr=attention&ureg">
+							<img src="ico/adduser.ico"  style="width:60px" title="Registrar Usuario">
+				         </a> 
+				         &nbsp;&nbsp; <a href="?vpre">
+								<img src="ico/view_user.png" style="width:60px" title="Ver Atención de Usuarios">
+						 	</a>
+						 &nbsp;&nbsp; <a href="/register_attention?rdr=attention&drec">
+								<img src="ico/receiptDocument.png"  style="width:80px" title="Registrar Documento Recibido">
+				         	</a>
+						 &nbsp;&nbsp;  <a href="/register_attention?rdr=attention&drec_v">
+								<img src="ico/view_document.png" style="width:53px" title="Ver Documentos Recibidos">
+						 	</a> 
+						 &nbsp;&nbsp; <a href="?vgra">
+							<img src="ico/graphic.png"  style="width:55px" title="Visalizar Indicador de Atención">
+						 		</a>
+						 &nbsp;&nbsp; <a href="attention_list" target="_blank">
+							<img src="ico/espera.png" style="width:70px" title="Modo lista de Espera ">
+						 		</a>
+		    		</div>
+		    	</div>
+		    	<div style="height: 1px;background-color:#D8D8D8;"></div>
+		      <div class="row" id="attention_content">
+		        <div class="col-lg-12">
+		          <br>
+		          <div style="text-align:center;font-weight: bold;">DATOS DE ATENCIÓN</div>
+		          <br>
+		          <ul class="text-xs-left">
+		            <li style="list-style:none;">
+		              <span onclick="attention_before();" style="color:blue;cursor:pointer;">Ver resumen de atención anterior</span>
+		              <div style="background-color: #FFFE99;padding:5px;box-shadow:6px 6px 3px #ccc;border-radius:10px;width: 500px;display: none;" align="center" id='attention_before'>
+		                <div style="text-decoration: underline;">Atención realizada con anterioridad el 16/05/2017</div>
+		                Resumen de Atención
+		                <textarea class="form-control" disabled cols="50" rows="3" placeholder="Resumen de Atención..." id="resumen_before"></textarea>
+		                Observación
+		                <textarea class="form-control" disabled cols="50" rows="3" placeholder="Observación..." id="observacion_before"></textarea>
+		                <button onclick="attention_before()">Ocultar</button>
+		              </div>
+		            </li>
+		            <br>
+		            <li>
+		              <b>Codigo:</b>&nbsp;&nbsp;&nbsp;
+		              <span id="id_attention">Cargando...</span>
+		            </li>
+		            <li>
+		              <b>Motivo:</b>
+		              &nbsp;&nbsp;&nbsp;&nbsp;<span id="motivo_name">Cargando...</span>
+		            </li>
+		            <li>
+		              <b>Dni:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		              <span id="dni">Cargando...</span>
+		            </li>
+		            <li>
+		              <b>Nombres:</b>
+		              <span id="nombres">Cargando...</span>
+		            </li>
+		            <li>
+		              <b>Edad:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		              <span id="edad">Cargando...</span>
+		            </li>
+		            <li>
+		              <b>Lugar:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		              <span id="lugar">Cargando...</span>
+		            </li>
+		            
+		            <li>
+		              <b>Identidad:</b>
+		              <span id="identidad">Cargando...</span>
+		            </li>
+		            <li>
+		              <b>Beca:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		              <span id="aspira_beca">Cargando...</span>
+		            </li>
+		          </ul>
+		          <span>Resumen de Atención</span>
+		          <textarea class="form-control" cols="50" rows="4" placeholder="Resumen de Atención..." id="resumen"></textarea>
+
+		          <span>Observación</span>
+		          <textarea class="form-control" cols="50" rows="3" placeholder="Observación..." id="observacion"></textarea>
+		          <br>
+		          <p class="text-muted">Es importante accionar el boton, para dar pase a los siguientes usuarios.</p>
+		          <input type="checkbox" id="btn_reenviar"> Activar Reenvio<br><br>
+		          <div id="reenvio">
+		            Reenviar usuario a: 
+		            <select id="reenvio_user">
+		              <option value=''>Seleccione</option>
+		            </select>
+		            <br><br>
+		            <span onclick="attention_finish(true);" class="btn btn-primary">Se atendio y reenviar
+		              <span style="color:yellow;"></span>
+		            </span>
+		            <span onclick="attention_finish(false);" class="btn bg-danger">No se atendio y reenviar
+		              <span style="color:yellow;"></span>
+		            </span>
+		          </div>
+		          <div id="sin_reenvio">
+		            <span onclick="attention_finish(true);" class="btn btn-primary">Finalizar Atención
+		              <span style="color:yellow;"></span>
+		            </span>            
+		            <span onclick="attention_finish(false);" class="btn bg-danger">No se atendio
+		              <span style="color:yellow;"></span>
+		            </span>
+		          </div>
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+		  
+		  <div class="container-fluid">
+		    <div align="center">
+		      <div class="row" id="p-control" style="padding: 6px 0px;">
+		        <span id="btn_ap_content">
+		          <span>siguiente</span>
+		          <img src="../img\next-p.png" width="60px" id="btn_ap" style="cursor:pointer;" onclick="next_at('ap');">&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
+		        </span>
+		        <span id="btn_ae_content">
+		          <span>siguiente</span>
+		          <img src="../img\next-e.png" width="50px" id="btn_ae" style="cursor:pointer;" onclick="next_at('ae');">
+		        </span>
+		      </div>
+		      
+
+		    </div>
+		    <div class="row" id="p-list">
+		      <div class="bg-info col-lg-6 col-xs-6">
+		        <h4 class="text-xs-center">Atención Preferencial</h4>
+		        <ul class="list-group" id="list_reservado">
+		          <li class="list-group-item text-muted" id="ap_top"></li>
+		          <div id="list_ap_espera"></div>
+		        </ul>
+		      </div>
+		      <div class="bg-success col-lg-6 col-xs-6">
+		        <h4 class="text-xs-center">Atención Estandar</h4>
+		        <ul class="list-group" id="list_estardar">
+		          <li class="list-group-item text-muted" id="ae_top"></li>
+		          <div id="list_ae_espera"></div>
+		        </ul>
+		      </div>
+		    </div>
+		  </div>
+		  
+
+
+		<%-init.foot%>
+		  <script>
+		    var ws = io();
+		    $(document).on("ready", function(){
+		      ws.on( "attention", function(new_attention){
+		        if(new_attention){
+		          cargar_lista();
+		        }
+		      });
+		    });
+		    var userArr = [];
+		    $(window).ready(function(){
+		      
+		      $("#reenvio").hide();
+
+		      $.post('/user_list', {param1: 'value1'}, function(dt, textStatus, xhr) {
+		        for( i in dt ){
+		          userArr[dt[i].id_usuario] = dt[i].usuario_name;
+		          $("#reenvio_user").append("<option value='"+dt[i].id_usuario+"'>"+dt[i].usuario_name+"</option>");
+		        
+		        }
+		        cargar_lista();
+		      });
+		      
+		    });
+		    $("#btn_reenviar").change(function(){
+		      // alert($(":checked").val());
+		      if( $(":checked").val() == "on" ){
+		        // alert("entro");
+		        $("#reenvio").show();
+		        $("#sin_reenvio").hide();
+		      }else{
+		        // alert("no entro");
+		        $("#reenvio").hide();
+		        $("#sin_reenvio").show();
+		      }
+		    });
+		    var abef = -1;
+		    function attention_before(){
+		      abef = abef * -1;
+		      if( abef == 1 ){
+				$.post('/attention_before', { dni: $("#dni").html() }, function(dt, textStatus, xhr) {
+		        /*optional stuff to do after success */
+		        if( dt[1].resumen == "" )
+		          dt[1].resumen = "No hay resumen que mostrar";
+		        if( dt[1].observacion == "" )
+		          dt[1].resumen = "No hay observacion que mostrar";
+
+		        $("#resumen_before").val(dt[1].resumen);
+		        $("#observacion_before").val(dt[1].observacion);
+		        // console.log(dt[0]);
+		        $('#attention_before').show();
+		      });
+		      }else{
+		      	$('#attention_before').hide();
+		      }
+		     
+		    }
+		    function attention_finish(ingreso){
+
+		      // alert($("#asunto").val());
+		      // alert( parseInt($("#btn_reenviar").is(":checked")) );
+		      // if($("#btn_reenviar").is(":checked"))
+		        // alert($("#reenvio_user").val());
+		      // else{
+		      //   alert("no entro");
+		      // }
+		      // return;
+		      $.post('/attention_finish', {
+		        id_attention: parseInt($("#id_attention").text())
+		        ,ingreso: ingreso // Es bolea<div></div>no
+		        ,observacion: $("#observacion").val()
+		        ,motivo_name: $("#motivo_name").text()  
+		        ,resumen: $("#resumen").val()
+		        ,reenvio_user: $("#reenvio_user").val()
+		        ,reenviar: $("#btn_reenviar:checked").val()
+		        ,dni: $("#dni").html()
+		      }, function(dt, textStatus, xhr) {
+		        /*optional stuff to do after success */
+		        if( ingreso )
+		        	alert(dt.msn);
+		        $("#observacion").val("");
+		        $("#resumen").val("");
+		      });
+		      // alert("entro");
+		    }
+		    function attention_panel(){
+		      $("#attention_content").show();
+		      var dh = "";
+
+		      $("#p-control").hide();
+		      // $("#p-list").hide();
+		    }
+		    var student_on = 0;
+		    var motivo_name = ['','Dudas y Consultas', 'Inscripción', 'Tramites']; //a partir del Uno
+		    var on_attention = false;
+		    var reenvioArr = [];
+		    function cargar_lista(){
+		      clear_list();
+		      $.post('/get_attention', {param1: 'value1'}, function(obj, textStatus, xhr) {
+		        on_attention = false;
+		        /*optional stuff to do after success */
+		        var c1 = 0;
+		        var c2 = 0;
+		        var nro = 0;
+		        var n1 = 1;
+		        var n2 = 1;
+		        // console.log(obj.length);
+		        for( i in obj){
+		          
+		          //Comprobamos si tiene una atención abierta
+		          if( obj[i].id_usuario == <%=user.id_usuario%> &&  obj[i].archivado == false ){
+		            on_attention = true;
+		            student_on = i;
+		          }
+		          // $("#attention_content").hide();
+		          if( obj[i].reenvio_user )
+		            reenvioArr[obj[i].id_attention] = obj[i].reenvio_user
+		          //fin de comprobación
+
+		          var type = "";
+		          if( obj[i].type == 1 ){ // 1 atención estandar
+		            c2++;
+		            type = "ae"; // atención estandar
+		            if( obj[i].select1 ) {
+		              n1++;
+		            }
+		            if( c2 == n1 ) $("#btn_ae").attr("onclick", "next_at('ae',"+obj[i].id_attention+",<%=user.id_usuario%>,'<%=user.usuario_name%>');");
+		            nro = c2;
+		          }else{
+		            c1++;
+		            type = "ap"; // atención preferencial
+		            if( obj[i].select1 ) {
+		              n2++;
+		            }
+		            if( c1 == n2 ) $("#btn_ap").attr("onclick", "next_at('ap',"+obj[i].id_attention+",<%=user.id_usuario%>,'<%=user.usuario_name%>');");
+		            ;
+		            nro = c1;
+		          }
+		          // alert(obj[i].true);
+		          if( obj[i].aspira_beca == "NO ES BECARIO" )
+		              obj[i].aspira_beca = " -";
+
+		          if( obj[i].select1 ){
+		            $("#"+type+"_top").append( '<span class="label label-pill pull-left text-muted" style="font-size:18px;">'+nro+'. </span><b>'+obj[i].nombres+'</b>'
+		            // +'<span class="label label-default label-pill pull-right">'+obj[i].motivo+'</span>' 
+		              +'<div style="font-size:11px;margin-top:-12px;">.<br>Motivo:'+obj[i].motivo_name+' <br>Lugar: '+obj[i].lugar+' - Identidad: '+obj[i].identidad+'</b><br></span>- <b>'+obj[i].aspira_beca+'</b><br><b>Atención por: <span style="color:blue;">'+obj[i].usuario_name+'</span></b>'+'<br>Hora de Registro: <span style="color:blue;font-size:11px;"><b>'+obj[i].hora+'</div>'
+		            ).attr("id_attention",obj[i].id_attention);
+		          }else{
+
+		            
+		            var dh = '<li class="list-group-item text-muted lista-espera" tipo="'+type+'" id_attention="'+obj[i].id_attention+'">'
+		              +'<span class="label label-pill pull-left text-muted" style="font-size:18px;">'+nro+'.</span>'
+		              	// +'<span class="label label-default label-pill pull-right">'+obj[i].motivo+'</span>'
+		              	+'<b>'+obj[i].nombres+'</b><div style="font-size:11px;margin-top:-12px;">.<br>Motivo:'+obj[i].motivo_name
+		              +'<div style="font-size:11px;margin-top:-12px;">.<br>Lugar: '+obj[i].lugar+' - Identidad: '+obj[i].identidad+'</b></span><br>- <b>'+obj[i].aspira_beca+'</b>'+'<br>Hora de Registro: <span style="color:blue;font-size:11px;"><b>'+obj[i].hora+'<br>'+
+		                (obj[i].reenvio_user != null ? 'Derivado para: '+userArr[obj[i].reenvio_user]:'')
+		              +'</div>'
+		            +'</li>';
+		            $("#list_"+type+"_espera").append(dh);
+		          }
+		        }
+
+		        if( c2 == 0 ){ $("#btn_ae_content").hide(); }else{ $("#btn_ae_content").show(); }
+		        if( c1 == 0 ){ $("#btn_ap_content").hide(); }else{ $("#btn_ap_content").show(); }
+		        if(on_attention){
+		          attention_panel();
+		          // alert("entro");
+		          
+
+		          $("#id_attention").html(obj[student_on].id_attention);
+		          $("#dni").html(obj[student_on].dni);
+		          $("#nombres").html(obj[student_on].nombres);
+		          $("#edad").html(obj[student_on].edad+" años");
+		          $("#lugar").html(obj[student_on].lugar);
+		          $("#motivo_name").html( "<b style='color:blue;'>"+obj[student_on].motivo_name+"</b>" );
+		          $("#identidad").html(obj[student_on].identidad);
+		          $("#aspira_beca").html(obj[student_on].aspira_beca);
+		        }else{
+		          $("#attention_content").hide();
+		          $("#p-control").show();
+		        }
+
+		        if( parseInt(obj.length) == 0 ){
+		          $("#p-control").hide();
+		        }
+		        //add double click
+		        $( ".lista-espera" ).dblclick(function() {
+		          // alert( "Hello World!" );
+		          if( on_attention ){
+		            alert("Acción no realizado porque tiene una atención activa, finalice la atención e intentelo denuevo");
+		          }else{
+		            var id_attention = $(this).attr('id_attention');
+		            var type = $(this).attr('tipo');
+		            // alert(tipo);
+		            next_at(type, id_attention, <%=user.id_usuario%>, '<%=user.usuario_name%>');            
+		          }
+		        });
+		      });
+		    }
+		    function clear_list(){
+		      $("#ap_top").html("");
+		      $("#list_ap_espera").html("");
+		      $("#ae_top").html("");
+		      $("#list_ae_espera").html("");
+		      $("#btn_reenviar").prop("checked",false);
+		      $("#reenvio").hide();
+		      $("#sin_reenvio").show();
+		    }
+		    function next_at(type, id_attention, id_usuario, usuario_name){
+		      // alert(id_usuario);
+		      if( reenvioArr[id_attention] == <%=user.id_usuario%> || !reenvioArr[id_attention] ){
+		        $.post('/next_at', {
+		          type: type 
+		          ,id_attention:id_attention
+		          ,id_usuario: id_usuario
+		          ,usuario_name: usuario_name
+		        }, function(data, textStatus, xhr) {
+		          /*optional stuff to do after success */
+		          if( !data.success ){
+		            // alert("Registrado con exito");
+		          
+		            alert("Lo sentimos, hubo un error");
+		          }
+		        });
+		      }else{
+		        alert("lo sentimos, usted no es el usuario dirigido");
+		      }
+		      
+
+		    }
+		    var a_cn=0;
+		    setInterval(function(){
+		      //alert("como");
+		      a_cn+=1;
+		      //alert((a_cn % 2));
+		      if( (a_cn % 2) == 1 ){
+		        if( $("#ap_top").text() != "" )
+		          $("#ap_top").css({"background-color":"yellow"});
+		        if( $("#ae_top").text() != "" )
+		          $("#ae_top").css({"background-color":"yellow"});
+		      }else{
+		        $("#ap_top").css({"background-color":""});
+		        $("#ae_top").css({"background-color":""});
+		      }
+		    },1000);
+		  </script>
+	<% } %>
+</body>
+
+</html>

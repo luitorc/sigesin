@@ -1,0 +1,263 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <%-init.head%>  
+  <style>
+    .texto_list {
+      font-size: 30px;
+    }
+    
+    body {
+      overflow-x: hidden;
+      overflow-y: hidden;
+    }
+    #register_attention{
+      position: fixed;
+      z-index: 22;
+      width: 100%;
+      /*float: left;*/
+    }
+    #registro_panel{
+      margin-top: 144px;
+      margin-left: -650px;
+    }
+  </style>
+  <script src="/socket.io/socket.io.js"></script>
+   <script type="text/javascript" src="js/soundjs-NEXT.combined.js"></script>
+</head>
+
+<body>
+
+  <div class="section" id="register_attention">
+    <div class="container">
+      <div class="row" align="center">
+        <% if(option != undefined){ %>
+        <div style="padding: 8px;background-color: white;width: 320px;box-shadow: 3px 3px 20px #616161">
+          <a href="/register_attention?rdr=attention_list?option&ureg">
+            <img src="ico/adduser.ico" width="55">
+          </a>
+          &nbsp;&nbsp;&nbsp;
+          <a href="/get_allAttention_req?dir=attention_list?option">
+            <img src="ico/view_user.png" width="55">
+          </a>
+          &nbsp;&nbsp;&nbsp;
+          <a href="/register_attention?rdr=attention_list&drec&option">
+            <img src="ico/receiptDocument.png" width="65">
+          </a>
+          &nbsp;&nbsp;&nbsp;
+          <a href="/register_attention?rdr=attention&drec_v">
+            <img src="ico/view_document.png" width="55">
+          </a>          
+        </div>
+        <% } %>
+        <!-- <div id="content" class="content" style="position: absolute; height: auto">
+          <div id="player">
+            <div id="playBtn" class="button playBtn"></div>
+            <div id="stopBtn" class="button stopBtn"></div>
+            <div id="track">
+              <div id="progress"></div>
+              <div id="thumb"></div>
+            </div>
+          </div>
+        </div>
+        <iframe src="/register_attention" frameborder="0" width="600" height="500" style="background-color: white;display: none;" id="registro_panel"></iframe> -->
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="row texto_list" style="padding:0px 10px;">
+          <div class="bg-info col-lg-6 col-xs-6" style="height:2500px;">
+            <br>
+            <h2 class="text-xs-center" >Atención Preferencial</h2>
+            <ul class="list-group" id="list_reservado">
+              <li class="list-group-item text-muted" id="ap_top">
+                
+              </li>
+              <div id="list_ap_espera">
+                
+              </div>
+            </ul>
+          </div>
+          <div class="bg-success col-lg-6 col-xs-6" style="height:2500px;">
+            <br>
+            <h2 class="text-xs-center">Atención Estandar</h2>
+            <ul class="list-group" id="list_estardar">
+              <li class="list-group-item text-muted" id="ae_top">
+                
+              </li>
+              <div id="list_ae_espera">
+                
+              </div>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <script>
+
+    var a_cn=0;
+    setInterval(function(){
+      //alert("como");
+      a_cn+=1;
+      //alert((a_cn % 2));
+      if( (a_cn % 2) == 1 ){
+        if( $("#ap_top").text() == "" )
+          $("#ap_top").css({"background-color":"#E7E7E7"});
+        else
+          $("#ap_top").css({"background-color":"yellow"});
+        if( $("#ae_top").text() == "" )
+          $("#ae_top").css({"background-color":"#E7E7E7"});
+        else
+          $("#ae_top").css({"background-color":"yellow"});
+      }else{
+        $("#ap_top").css({"background-color":""});
+        $("#ae_top").css({"background-color":""});
+      }
+    },1000);
+  </script>
+  <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdn.rawgit.com/twbs/bootstrap/v4-dev/dist/js/bootstrap.js"></script>
+  <!-- <img src="img/access1.png" alt=""> -->
+<script>
+var userArr = [];
+$(window).ready(function(){
+  $.post('/user_list', {param1: 'value1'}, function(dt, textStatus, xhr) {
+    for( i in dt ){
+      userArr[dt[i].id_usuario] = dt[i].usuario_name;
+      $("#reenvio_user").append("<option value='"+dt[i].id_usuario+"'>"+dt[i].usuario_name+"</option>");
+    }
+    cargar_lista();
+  });
+}); 
+
+var font_size = 30;
+  var ws = io();
+    $(document).on("ready", function(){
+      ws.on('attention_sound2', function(new_attention){
+        instance.position=0;
+        instance.play();
+      });
+      ws.on( "attention", function(new_attention){
+        if(new_attention){
+          cargar_lista();
+        }
+      });
+    });
+  var audioElement;
+  audioElement = document.createElement('audio');
+  audioElement.setAttribute('src', 'sound/ping1.mp3');
+  
+  var panel = -1;
+    function abrir_panel(){
+      panel = panel * -1;
+      if(panel == 1)
+        $('#registro_panel').show()
+      else
+        $('#registro_panel').hide()
+    }
+    function cargar_lista(){
+      clear_list();
+      $.post('/get_attention', {param1: 'value1'}, function(obj, textStatus, xhr) {
+        /*optional stuff to do after success */
+        var c1 = 0;
+        var c2 = 0;
+        var nro = 0;
+        var n1 = 1;
+        var n2 = 1;
+        // console.log(obj.length);
+        for( i in obj){
+          // alert(obj[i].nombres);
+          var type = "";
+          if( obj[i].type == 1 ){ // 1 atención estandar
+            c2++;
+            type = "ae"; // atención estandar
+            if( obj[i].select1 ) {
+              n1++;
+            }
+            if( c2 == n1 ) $("#btn_ae").attr("onclick", "next_at('ae',"+obj[i].id_attention+");");
+            nro = c2;
+          }else{
+            c1++;
+            type = "ap"; // atención preferencial
+            if( obj[i].select1 ) {
+              n2++;
+            }
+            if( c1 == n2 ) $("#btn_ap").attr("onclick", "next_at('ap',"+obj[i].id_attention+");");
+            nro = c1;
+          }
+          // alert(obj[i].true);
+          if( obj[i].select1 ){
+            $("#"+type+"_top").append( '<span class="label label-pill pull-left text-muted" style="font-size:'+font_size+'px;">'+nro+'</span><span style="font-size:'+font_size+'px;">'+obj[i].nombres+"</span>"
+              +"<div style='font-size:"+(font_size-8)+"px;color:blue;'>-> "+obj[i].usuario_name+"</div>"
+            +'' ).attr("id_attention",obj[i].id_attention);
+            audioElement.currentTime = 0;
+            audioElement.play();
+            
+            // instance.position=0;
+            // instance.play();
+            // alert("entro");
+            
+          }else{
+            var dh = '<li class="list-group-item text-muted" id_attention="'+obj[i].id_attention+'">'
+              +'<span class="label label-pill pull-left text-muted" style="font-size:'+font_size+'px;">'+nro+'.</span>'
+              +'<span style="font-size:'+font_size+'px;">'+obj[i].nombres+'</span><br><span style="font-size:18px;color:#22ADA8;">'+
+              (obj[i].reenvio_user != null ? 'Derivado para: <b>'+userArr[obj[i].reenvio_user]+'</b>':'')+'</span>'
+            +'</li>';
+            $("#list_"+type+"_espera").append(dh);
+          }
+        }
+      });
+    }
+
+    function clear_list(){
+      $("#ap_top").html("");
+      $("#list_ap_espera").html("");
+      $("#ae_top").html("");
+      $("#list_ae_espera").html("");
+    }
+</script>
+
+<script type="text/javascript" >
+$(document).ready(function() {
+  mediaplayer_init();
+});
+  function mediaplayer_init() {
+    if (!createjs.Sound.initializeDefaultPlugins()) {
+      document.getElementById("error").style.display = "block";
+      document.getElementById("content").style.display = "none";
+      return;
+    }
+    createjs.Sound.alternateExtensions = ["mp3"]; 
+    createjs.Sound.addEventListener("fileload", createjs.proxy(handleLoadComplete, this)); // add an event 
+    createjs.Sound.registerSound("sound/ping2.mp3", "music");
+  }
+
+  var instance;
+  var positionInterval;
+  var seeking = false;
+
+  function handleLoadComplete(event) {
+    instance = createjs.Sound.play("music").stop();
+    instance.addEventListener("complete", function () {
+      clearInterval(positionInterval);
+    }); trackTime();
+  }
+
+  var dragOffset;
+  function trackTime() {
+    positionInterval = setInterval(function (event) {
+      if (seeking) return;
+      var porcentaje_carga = instance.getPosition() / instance.getDuration() * $("#track").width();
+    }, 30);
+  }
+</script>
+
+</body>
+
+</html>

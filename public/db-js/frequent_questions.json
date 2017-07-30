@@ -1,0 +1,26 @@
+[
+	{
+		"_id": 1
+		,"pregunta": "¿Que puedo hacer, mi Internet esta muy lento?"
+		,"respuesta": "Este problema es muy común en las oficinas, una solución practica es intentar apagar y desenchufar el Router por 10 segundos, luego volverlo a enchufar y encenderlo.<br>Otras causar viene a darse por la señal en Wifi, esto es debido a la perdida de señal que sucede al encontrarse frente a muros, por ello es recomendable colocar el Router en un lugar centrado en la oficina, donde la señal se esparza libremente.<br>Otras medidas, es cerrar programas que no se este utilizando, aveces la lentitud no se encuentra en Internet, muchas veces se encuentra en el equipo por la gran cantidad de programas abiertos, los cuales, generan lentitud en el procesamiento del equipo (Equipo lento), recomendable es mantener abierto programas que se estén utilizando en el momento"
+		,"img_rsta": "1"
+	},
+	{
+		"_id": 2
+		,"pregunta": "¿No se porque mi ordenador anda muy lento?"
+		,"respuesta": "Estos casos suelen suceder después de abrir múltiples programas, y cerrarlos de forma incorrecta, o tener varios programas desconocidos en su ordenador.<br>Por ello es recomendable, tener instalado solo los programas necesarios para sus funciones especificas.<br>En caso que la lentitud persista, revise el administrador de tareas, presionando sin soltar las siguientes telas \"Ctr+alt+Sup\" sin comillas, esto lo llevara al Administrador de tareas, y seleccionar la sección de procesos, para poder visualizar todos los programas activos, luego deberá ordenar por peso, para detectar los programas que mas carga la memoria, y cpu, y después finalizar la tarea en aquellos que no se este utilizando, esto liberara memoria, permitiendo operar con normalidad."
+		,"img_rsta": "1"
+	},
+	{	
+		"_id": 3
+		,"pregunta": "¿Como puedo configurar la impresora de Pronabec-Moquegua para mi ordenador"
+		,"respuesta": "Para realizar la conexión correcta, deberá seguir los siguientes paso:<br>1.- Debe tener el CD-ROM de instalación que llega por defecto en la caja del equipo, o solicitarlo a el área de sistemas.<br>2.- Copiarlo en su ordenador, o ejecutarlos directamente desde el CD-ROM.<br>3.- Se le abrirá un asistente de instalación (Interface de instalación), deberá seguir los pasos de instalación que por defecto lo puede encontrar en el siguiente link <a href='http://downloadcenter.samsung.com/content/UM/201601/20160112133930553/ES/Spanish/Spanish/manual/local.htm?isTocLink=fixed' target='_blank'>Click aqui</a>.<br>4.- Al finalizar la instalación deberá imprimir una hoja de prueba para corroborar que se encuentre instalado correctamente."
+		,"img_rsta": "1"
+	},
+	{
+		"_id": 4
+		,"pregunta": "¿Mi programa se congelo, que puedo hacer?"
+		,"respuesta": "La causa de un programa congelado, viene hacer cuando los procesos que le encargas a este se le dificulta por la gran cantidad de trabajo que este procesa al mismo tiempo.<br>Recomendación: Si tiene información valiosa sin guardar, lo recomendable es esperar unos minutos, hasta que el programa vuelva en si (Realmente esta procesando, pero de forma muy lenta), e inmediatamente guardarlo en un lugar rápidamente, antes que vuelva a congelarse.<br>Si el problema persiste, ingresar al Administrador de tareas, e ingresar a procesos, posteriormente ordenarlo por peso en Ram y Cpu, le mostrara los archivos que estan causando la congestión, y debera identificar con mucho cuidado, su programa para no tocarlo borrarlo, mas los otros debera finalizar su proceso con mucho cuidado, y vera como el ordenador, volvera a recuperar su funcionalidad (Lo recomendable es hacer este proceso con apoyo del soporte informatico)."
+		,"img_rsta": "1"
+	}
+]

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/jquery.dataTables.min.css">
+  <style>
+  	tr.table_becario_select th,td{
+		padding: 2px;
+  	}
+  </style>
+  </head>
+  <body>
+    <div class="container">
+	  <!-- Content here -->
+		<div class="row">
+			<div class="col-12" align='center'>
+				<h3>Directorio Becario</h3>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12">
+				<div class="input-group input_searchcontent">
+			      <span class="input-group-btn">
+			        <!-- <button class="btn btn-secondary" type="button">Buscar</button> -->
+			      </span>
+			    </div>
+			</div>
+		</div>
+		<br>
+		<div class="row">
+			<div class="col-12">
+				<table class='table' id='tb_directoriobecario'>
+					<thead>
+						<tr>
+							<th>N°</th>
+							<th>Apellidos y Nombres</th>
+							<th>Dirección</th>
+							<th>Telefono</th>
+							<th>Familiar</th>
+							<th>Acción</th>
+						</tr>
+					</thead>
+					<tbody id='becarios_list'>
+						<tr>
+							<td align="center" colspan="5">
+								<img src="img/loading2.gif" alt="">
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- Modal -->
+	<div class="modal fade" id="viewBecario_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog modal-lg"" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="exampleModalLabel">Datos del becario</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body" id='content_databecario'>
+
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+
+	      </div>
+	    </div>
+	  </div>
+	</div>
+    <!-- jQuery first, then Tether, then Bootstrap JS. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <script src="js/jquery.dataTables.min.js"></script>
+    <script>
+    	var rows = [];
+	    $(document).ready(function() {
+	    	//Movemos el input search a otro lugar y añadimos style
+    		
+	   		
+	   		construct_data();
+	    });
+	    function construct_data(){
+	    	getData(function(table){
+	    		var row = table.split(";");
+	    		rows = row;
+	    		var trs = "";
+	    		for( var i=1;i<row.length;i++ ){
+	    			var cell = row[i].split("\t");
+	    			trs +="<tr>"
+	    					+"<td>"+i+"</td>"
+	    					+"<td>"+cell[1]+"</td>"
+	    					+"<td>"+cell[12]+"</td>"
+	    					+"<td title='Becario'>"+cell[7]+"</td>"
+	    					+"<td title='"+cell[16]+": "+cell[15]+"'>"+cell[17]+"</td>"
+	    					+"<td><button onclick=\"viewBecario("+i+")\" data-toggle='modal' data-target='#viewBecario_modal' style='cursor:pointer;'><img src='ico/serach_regis.png' width='30'></button></td>"
+	    				+"</tr>";
+	    			// console.log("jaja  ");
+	    		}
+	    		$("#becarios_list").html(trs);
+	    		// console.log(row[1]);
+    			$("#tb_directoriobecario").DataTable();
+    			$(".search_input").prependTo(".input_searchcontent").addClass('form-control').addClass('col-12').attr('placeholder',"Buscador de becarios");
+	    	});
+	    }
+	    function viewBecario(index){
+	    	console.log(index);
+	    	// alert(rows[index]);
+	    	var dh = "<table border='0' class='table'>";
+	    	var header = rows[0].split("\t");
+	    	var cell = rows[index].split("\t");
+	    	// for(var i=0;i<header.length;i++){
+	    	// 	dh+="<th>"+header[i]+"</th>";
+	    	// }
+	    	// dh+="</tr>";
+	    	for( var i=0;i<cell.length;i++ ){
+	    	dh+="<tr>"
+		    		+"<th>"+header[i]+"</th>"
+		    		+"<td>: "+cell[i]+"</td>"
+		    	+"</tr>";
+	    	}
+	    	dh+="</table>";	
+	    	$("#content_databecario").html(dh);
+	    }
+	    function getData(callback1){
+	    	$.ajax({
+		        type : "GET",
+		        contentType : "application/json",
+		        url : "http://ilored.com/app/directorio_becario/query_sheet.php?all&word=",
+		      //   data : {
+		      //   		"all":""
+		    		// 	,"word":""
+		    		// },
+		        success : function(data) {
+		            // alert(JSON.stringify(data));
+		            // console.log(JSON.parse(data));
+		            callback1(data);
+		            //constructor_list(JSON.parse(data)); //enviamos en obj
+		            //objaux = JSON.parse(data); // guardamos contenido
+		            //app.ShowPopup();
+		        },
+		        error : function(e) {
+		            console.log("ERROR: ", e);
+		        },
+		        done : function(e) {
+		            console.log("DONE");
+		        }
+		    });
+	    }
+    </script>
+  </body>
+</html>

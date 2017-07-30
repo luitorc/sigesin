@@ -1,0 +1,271 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<title>Chat Pronabec</title>
+<script src="js/socket.io.js"></script>
+<script src="js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="js/soundjs-NEXT.combined.js"></script>
+<style>
+	body{
+		margin:0;
+		overflow-x: hidden; 
+	}
+</style>
+</head>
+<body>
+<div id="content" class="content" style="position: absolute; height: auto">
+<!--     <button onclick="instance.position=0;instance.stop();">Reiniciar</button>
+    <button onclick="instance.play();">Play</button> -->
+    <div id="player">
+      <div id="playBtn" class="button playBtn"></div>
+      <div id="stopBtn" class="button stopBtn"></div>
+      <div id="track">
+        <div id="progress"></div>
+        <div id="thumb"></div>
+      </div>
+    </div>
+  </div>
+	<% if( typeof params.cwri != 'undefined'){ %>
+		<%-chat_write()%>
+	<% }else if( typeof params.clis != 'undefined'){ %>
+		<%-chat_list(usuario)%>
+	<% }else if( typeof params.uinf != 'undefined'){ %>
+
+			<%
+				var data1 = lib.Deasync(function(callback){
+					model.user.user_allData({id_usuario:params.id_user},function(obj1){
+						callback(null,obj1);
+					});
+				})();
+			%>
+			<%-user_info(data1)%>
+	<% }else{ %>
+		<!-- Contenido de inicio -->
+		<div>
+			<%-access() %>
+		</div>
+
+
+	<%}%>
+<script type="text/javascript" >
+
+$(document).ready(function() {
+  mediaplayer_init();
+});
+  function mediaplayer_init() {
+    if (!createjs.Sound.initializeDefaultPlugins()) {
+      document.getElementById("error").style.display = "block";
+      document.getElementById("content").style.display = "none";
+      return;
+    }
+    createjs.Sound.alternateExtensions = ["mp3"]; 
+    createjs.Sound.addEventListener("fileload", createjs.proxy(handleLoadComplete, this)); // add an event 
+    createjs.Sound.registerSound("sound/tucutin1.mp3", "music");
+  }
+
+  var instance;
+  var positionInterval;
+  var seeking = false;
+
+  function handleLoadComplete(event) {
+    instance = createjs.Sound.play("music");
+    instance.stop();
+    instance.addEventListener("complete", function () {
+      clearInterval(positionInterval);
+    }); trackTime();
+  }
+
+  var dragOffset;
+  function trackTime() {
+    positionInterval = setInterval(function (event) {
+      if (seeking) return;
+      var porcentaje_carga = instance.getPosition() / instance.getDuration() * $("#track").width();
+    }, 30);
+  }
+</script>
+
+<script>
+document.addEventListener('backbutton', onBackKeyDown, false);
+
+function onBackKeyDown(event) {
+    // Handle the back button
+    event.preventDefault();
+    alert('I am a demo purpose alert thingy');
+}
+var cont2 =0;
+<% if( typeof usuario != "undefined"){%>	
+	// var audioElement;
+	// audioElement = document.createElement('audio');
+	// audioElement.setAttribute('src', 'sound/tucutin1.mp3');
+
+	var ws = io();
+	$(document).on("ready", function(){
+
+		ws.on('chat_ping_res', function(id_user){
+			// var time1 = setTimeout(function(){
+   //      		$("#user_"+id_user).css({"color":"","text-shadow":""});
+   //      	},5000);
+   			removeSleep(id_user,4900);
+				$("#user_"+id_user).css({"color":"#00D900","text-shadow":"1px 1px 2px #999"});
+
+			// clearInterval(time1);
+			// console.log("#user_"+id_user);
+		});
+		<% if( typeof params.cwri != "undefined"){%>
+			msn_waiting("cwri");
+		<%}%>
+		<% if( typeof params.uinf != "undefined"){%>
+			msn_waiting("uinf");
+		<%}%>
+		ws.on('chat_msn_res', function(dt){
+			if( dt.zumbido != undefined ){
+				if(dt.user_recept == <%=usuario.id_usuario%>){
+					createjs.Sound.registerSound("sound/zumbidomsn.mp3", "music");
+					setTimeout(function(){
+						try{
+							instance.position=0;
+							instance.play();
+							setTimeout(function(){
+								createjs.Sound.registerSound("sound/tucutin1.mp3", "music");
+							},1000);
+							// createjs.Sound.registerSound("sound/tucutin1.mp3", "music");
+						}catch(ex){
+							// alert("no es compatible")
+						}
+					},1000);
+					// alert("ENTRO");
+				}				
+			}
+			if(dt.user_recept == <%=usuario.id_usuario%> && dt.user_emit == <%=params.id_user%> ){
+			
+				
+			    // setTimeout(function(){
+			    	// console.log("hola mundo");
+			    	// ws.emit("chat_msn_req", dt);
+			    // },3000);
+
+			    view_min_msnXuser();
+			    	out_box = true;
+			    	viewed = false;
+				// ws.emit("notify_vibrador_req", dt);
+			}else{
+				 // setTimeout(function(){
+			    	// ws.emit("chat_msn_req", dt);
+			    // },3000);
+				if(dt.user_recept == <%=usuario.id_usuario%>){
+			    	console.log("hola mundo");
+					
+					ws.emit("notify_req", dt);
+					try{
+						instance.position=0;
+        				instance.play();
+					}catch(ex){
+						// alert("no es compatible")
+					}
+					// audioElement.currentTime = 0;
+					// audioElement.play();
+					
+					cont2++;
+				}
+			}
+
+			<% if( typeof params.clis != "undefined"){%>
+				msn_waiting("clis");
+			<%}%>
+			<% if( typeof params.cwri != "undefined"){%>
+				msn_waiting("cwri");
+			<%}%>
+			
+
+
+		});
+		ws.on('chat_viewed_res', function(dt){
+			if(dt.user_recept == <%=params.id_user%> && dt.user_emit == <%=usuario.id_usuario%> ){
+				viewed_verify();
+			}
+		});
+
+	});
+	function ejecute_sound1(dt){
+		if(dt.user_recept == <%=usuario.id_usuario%>){
+					
+			ws.emit("notify_req", dt);
+			try{
+				instance.position=0;
+				instance.play();
+			}catch(ex){
+				// alert("no es compatible")
+			}
+			cont2++;
+		}
+	}
+	function removeSleep(id_user,time){
+		setTimeout(function(){
+    		$("#user_"+id_user).css({"color":"","text-shadow":""});
+    		// callback1();
+    	},time);
+	}
+	var user_emit = 0;
+	<% if( typeof params.id_user != "undefined"){%>
+		user_emit = <%=params.id_user%>
+	<%}%>
+
+	function msn_waiting(tipo){
+		
+		switch(tipo){
+			case 'clis':
+				$.post('/msn_waiting', {id_usuario: <%=usuario.id_usuario%>,user_emit: user_emit}, function(dt, textStatus, xhr) {
+					// location.reload();
+					chat_list();
+				});
+				break;
+
+			case 'cwri':
+				$.post('/msn_waiting', {id_usuario: <%=usuario.id_usuario%>,user_emit: user_emit}, function(dt, textStatus, xhr) {
+					// location.reload();
+					if( dt[0].count == 0 )
+						$("#alerta_msn").hide();
+					else{
+						$("#alerta_msn").show().html(dt[0].count);
+					}
+				});
+				break;
+			case 'uinf':
+				$.post('/msn_waiting', {id_usuario: <%=usuario.id_usuario%>,user_emit: user_emit}, function(dt, textStatus, xhr) {
+					// location.reload();
+					if( dt[0].count == 0 )
+						$("#alerta_msn").hide();
+					else
+						$("#alerta_msn").show().html(dt[0].count);
+				});
+				break;
+		}
+		if(cont2 == 1){
+			// alert("jaja");
+			// audioElement.currentTime = 0;
+			// audioElement.play();
+		}	
+	}
+	function zumbar(){
+		console.log("entro");
+  		ws.emit('chat_msn_req', {
+			user_recept: id_agente_recept
+			,user_emit: <%=usuario.id_usuario%>
+			,texto: "asas"
+			,usuario_name: "<%=usuario.usuario_name%>"
+			,zumbido: true
+		});
+  	}
+	$(document).ready(function() {
+		ws.emit("chat_ping_req", <%=usuario.id_usuario%>);
+	});
+	setInterval(function(){
+		ws.emit("chat_ping_req", <%=usuario.id_usuario%>);
+	},5000);
+<% }%>
+</script>
+</body>
+</html>
